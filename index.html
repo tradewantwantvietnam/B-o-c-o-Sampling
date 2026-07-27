@@ -149,7 +149,7 @@
 
 <style>
 /* ==========================
-   RESET
+   RESET & MOBILE VIEWPORT FIX
 ========================== */
 *{
     margin:0;
@@ -163,13 +163,8 @@ body{
     height:100%;
     background:#f6f6f6;
     overflow:hidden;
-    font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Arial,
-    sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 16px;
 }
 /* ==========================
    PAGE
@@ -185,58 +180,59 @@ body{
     display:none;
     align-items:center;
     justify-content:center;
-    padding:20px;
+    padding:16px;
     background:#f6f6f6;
 }
 .page.active{
     display:flex;
 }
 /* ==========================
-   CARD
+   CARD (Responsive Mobile)
 ========================== */
 .card{
     width:100%;
-    max-width:420px;
+    max-width:480px;
     background:white;
-    border-radius:24px;
-    padding:28px;
-    box-shadow:
-    0 10px 30px rgba(0,0,0,.08);
+    border-radius:20px;
+    padding:24px 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
 }
 .card h1{
     text-align:center;
-    font-size:30px;
-    margin-bottom:10px;
+    font-size:26px;
+    margin-bottom:8px;
     color:#222;
 }
 .card h2{
     text-align:center;
-    margin-bottom:20px;
+    font-size:22px;
+    margin-bottom:16px;
     color:#222;
 }
 .subtitle{
     text-align:center;
     color:#666;
-    margin-bottom:30px;
+    font-size:15px;
+    margin-bottom:20px;
 }
 /* ==========================
-   INPUT
+   INPUT & SELECT (To, dễ bấm)
 ========================== */
 label{
     display:block;
-    margin-top:15px;
-    margin-bottom:8px;
-    font-size:14px;
+    margin-top:12px;
+    margin-bottom:6px;
+    font-size:15px;
     font-weight:600;
-    color:#555;
+    color:#444;
 }
 input,
 select{
     width:100%;
-    height:52px;
-    border-radius:14px;
-    border:1px solid #ddd;
-    padding:0 16px;
+    height:50px;
+    border-radius:12px;
+    border:1px solid #ccc;
+    padding:0 14px;
     font-size:16px;
     outline:none;
     background:white;
@@ -246,14 +242,14 @@ select:focus{
     border-color:#ff6b00;
 }
 /* ==========================
-   BUTTON
+   BUTTON (To, dễ chạm trên mobile)
 ========================== */
 button{
     width:100%;
-    height:56px;
-    margin-top:18px;
+    height:52px;
+    margin-top:14px;
     border:none;
-    border-radius:16px;
+    border-radius:14px;
     background:#ff6b00;
     color:white;
     font-size:17px;
@@ -262,7 +258,7 @@ button{
     transition:.2s;
 }
 button:active{
-    transform:scale(.98);
+    transform:scale(.97);
 }
 button:disabled{
     opacity:.5;
@@ -300,65 +296,63 @@ button:disabled{
     position:fixed;
     left:0;
     right:0;
-    bottom:30px;
+    bottom:24px;
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:18px;
+    gap:16px;
     z-index:100;
 }
 .cameraToolbar button{
-    width:70px;
-    height:70px;
+    width:64px;
+    height:64px;
     border-radius:50%;
     margin:0;
-    font-size:28px;
+    font-size:26px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 #btnCapture{
-    width:90px;
-    height:90px;
-    font-size:34px;
+    width:80px;
+    height:80px;
+    font-size:32px;
 }
 /* ==========================
    PREVIEW
 ========================== */
 #previewImage{
     width:100%;
-    border-radius:18px;
-    margin-bottom:20px;
+    max-height:50vh;
+    object-fit:contain;
+    border-radius:14px;
+    margin-bottom:14px;
 }
 /* ==========================
    LOADER
 ========================== */
 .loader{
-    width:70px;
-    height:70px;
+    width:60px;
+    height:60px;
     border-radius:50%;
-    border:6px solid #ddd;
+    border:5px solid #ddd;
     border-top-color:#ff6b00;
-    margin:25px auto;
+    margin:20px auto;
     animation:spin .8s linear infinite;
 }
 @keyframes spin{
-    from{
-        transform:rotate(0deg);
-    }
-    to{
-        transform:rotate(360deg);
-    }
+    from{ transform:rotate(0deg); }
+    to{ transform:rotate(360deg); }
 }
 /* ==========================
    MESSAGE
 ========================== */
 .msg{
-    margin-top:15px;
+    margin-top:12px;
     text-align:center;
     color:#666;
-    line-height:1.5;
+    line-height:1.4;
 }
-/* ==========================
-   SUCCESS
-========================== */
 .success{
     color:#2e7d32;
 }
@@ -370,7 +364,7 @@ button:disabled{
 ========================== */
 @supports(padding:max(0px)){
 .cameraToolbar{
-padding-bottom:max(20px,env(safe-area-inset-bottom));
+    padding-bottom:max(16px,env(safe-area-inset-bottom));
 }
 }
 /* ==========================
@@ -387,12 +381,12 @@ body{
    FADE ANIMATION
 ========================== */
 .page{
-    animation:fade .25s;
+    animation:fade .2s;
 }
 @keyframes fade{
     from{
         opacity:0;
-        transform:translateY(10px);
+        transform:translateY(8px);
     }
     to{
         opacity:1;
