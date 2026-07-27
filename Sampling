@@ -580,13 +580,13 @@ document.getElementById("btnReport").onclick = ()=>{
 // PHOTO MENU
 //=========================
 document.getElementById("btnCheckIn").onclick = ()=>{
-    currentMode = "checkin";
+    currentMode = "CHECKIN";
     document.getElementById("storeTitle").innerHTML =
         "📷 Check-in";
     showPage("storePage");
 };
 document.getElementById("btnCheckOut").onclick = ()=>{
-    currentMode = "checkout";
+    currentMode = "CHECKOUT";
     document.getElementById("storeTitle").innerHTML =
         "📷 Check-out";
     showPage("storePage");
@@ -829,27 +829,24 @@ async function uploadImage(){
 );
         let result =
     await response.json();
+    console.log("HTTP:", response.status);
+    console.log("DATA:", result);
     console.log("SERVER:", result);
     if(!response.ok){
     throw new Error(
         "HTTP Error: " + response.status
     );
 }
-        if(result.status==="success"){
-            uploadedImageURL =
-            result.url;
-            showPage(
-                "finishPage"
-            );
-        }
-        else{
-            alert(
-                "Lưu ảnh thất bại"
-            );
-            showPage(
-                "previewPage"
-            );
-        }
+        if(result.success === true){
+    uploadedImageURL = result.url;
+    showPage("finishPage");
+}
+else{
+    alert(
+        "Lưu ảnh thất bại: " + result.error
+    );
+    showPage("previewPage");
+}
     }
     catch(error){
         console.log(error);
@@ -881,10 +878,12 @@ document
 .getElementById("btnContinueReport")
 .onclick = ()=>{
     let url="";
-    if(currentMode==="checkin"){
-        url =
-        CHECKIN_FORM;
-    }
+    if(currentMode==="CHECKIN"){
+    url = CHECKIN_FORM;
+}
+else{
+    url = CHECKOUT_FORM;
+}
     else{
         url =
         CHECKOUT_FORM;
