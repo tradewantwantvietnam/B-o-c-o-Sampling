@@ -1,109 +1,62 @@
 <body>
-
 <div id="app">
-
     <!-- ================= HOME ================= -->
-
     <section id="homePage" class="page active">
-
         <div class="card">
-
             <h1>📸 Sampling 2026</h1>
-
             <p class="subtitle">
                 Hệ thống Check-in / Check-out Sampling
             </p>
-
             <button id="btnPhoto">
                 📷 Chụp ảnh
             </button>
-
             <button id="btnReport">
                 📝 Báo cáo
             </button>
-
         </div>
-
     </section>
-
-
-
     <!-- ================= PHOTO MENU ================= -->
-
     <section id="photoMenu" class="page">
-
         <div class="card">
-
             <h2>Chọn loại chụp</h2>
-
             <button id="btnCheckIn">
                 🟢 Check-in
             </button>
-
             <button id="btnCheckOut">
                 🔴 Check-out
             </button>
-
             <button class="btnBack">
                 ⬅ Quay lại
             </button>
-
         </div>
-
     </section>
-
-
-
     <!-- ================= REPORT MENU ================= -->
-
     <section id="reportMenu" class="page">
-
         <div class="card">
-
             <h2>Chọn loại báo cáo</h2>
-
             <button id="btnReportCheckIn">
                 🟢 Báo cáo Check-in
             </button>
-
             <button id="btnReportCheckOut">
                 🔴 Báo cáo Check-out
             </button>
-
             <button class="btnBack">
                 ⬅ Quay lại
             </button>
-
         </div>
-
     </section>
-
-
-
     <!-- ================= STORE ================= -->
-
     <section id="storePage" class="page">
-
         <div class="card">
-
             <h2 id="storeTitle">
-
             </h2>
-
             <label>
-
                 Mã điểm bán
-
             </label>
-
             <input
-
                 id="storeCode"
-
                 type="text"
-
                 autocomplete="off"
-
                 placeholder="Ví dụ: TNI007701"
 
             >
@@ -141,47 +94,26 @@
                 ⬅ Quay lại
 
             </button>
-
         </div>
-
     </section>
-
-
-
     <!-- ================= CAMERA ================= -->
 
     <section id="cameraPage" class="page camera-page">
-
         <video
-
             id="video"
-
             autoplay
-
             playsinline
-
         ></video>
-
         <canvas
-
             id="canvas"
-
             style="display:none"
-
         ></canvas>
-
         <img
-
             id="preview"
-
         >
-
         <div class="cameraToolbar">
-
             <button id="btnSwitchCamera">
-
                 🔄
-
             </button>
 
             <button id="btnCapture">
@@ -199,9 +131,6 @@
         </div>
 
     </section>
-
-
-
     <!-- ================= PREVIEW ================= -->
 
     <section id="previewPage" class="page">
@@ -251,67 +180,41 @@
                 ✔ Lưu hình và kết thúc
 
             </button>
-
             <button id="btnContinueReport">
-
                 📝 Lưu hình và tiếp tục báo cáo
-
             </button>
-
         </div>
-
     </section>
-
-
-
     <!-- ================= LOADING ================= -->
-
     <section id="loadingPage" class="page">
-
         <div class="card">
-
             <h2>
-
                 Đang lưu ảnh...
-
             </h2>
-
             <div class="loader"></div>
-
             <p>
-
                 Vui lòng không đóng trình duyệt
-
             </p>
-
         </div>
-
     </section>
-
 </div>
 
 </body>
 /* ==========================
    RESET
 ========================== */
-
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
 }
-
 html,
 body{
-
     width:100%;
     height:100%;
-
     background:#f6f6f6;
-
     overflow:hidden;
-
     font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -319,121 +222,65 @@ body{
     Roboto,
     Arial,
     sans-serif;
-
 }
-
-
 /* ==========================
    PAGE
 ========================== */
-
 #app{
-
     width:100%;
     height:100%;
-
     position:relative;
-
 }
-
 .page{
-
     position:absolute;
-
     inset:0;
-
     display:none;
-
     align-items:center;
-
     justify-content:center;
-
     padding:20px;
-
     background:#f6f6f6;
-
 }
-
 .page.active{
-
     display:flex;
-
 }
-
-
 /* ==========================
    CARD
 ========================== */
-
 .card{
-
     width:100%;
-
     max-width:420px;
-
     background:white;
-
     border-radius:24px;
-
     padding:28px;
-
     box-shadow:
-
     0 10px 30px rgba(0,0,0,.08);
-
 }
-
 .card h1{
-
     text-align:center;
-
     font-size:30px;
-
     margin-bottom:10px;
-
     color:#222;
-
 }
-
 .card h2{
-
     text-align:center;
-
     margin-bottom:20px;
-
     color:#222;
-
 }
-
 .subtitle{
-
     text-align:center;
-
     color:#666;
-
     margin-bottom:30px;
-
 }
-
-
 /* ==========================
    INPUT
 ========================== */
-
 label{
-
     display:block;
-
     margin-top:15px;
-
     margin-bottom:8px;
-
     font-size:14px;
-
     font-weight:600;
-
     color:#555;
-
 }
 
 input,
@@ -970,16 +817,24 @@ async function uploadImage(){
         };
         let response =
         await fetch(
-            SCRIPT_URL,
-            {
-                method:"POST",
-                body:
-                JSON.stringify(payload)
-            }
-        );
+          SCRIPT_URL,
+  {
+    method:"POST",
+    headers:{
+        "Content-Type":"text/plain;charset=utf-8"
+    },
+    body:
+    JSON.stringify(payload)
+  }
+);
         let result =
-        await response.json();
-        console.log(result);
+    await response.json();
+    console.log("SERVER:", result);
+    if(!response.ok){
+    throw new Error(
+        "HTTP Error: " + response.status
+    );
+}
         if(result.status==="success"){
             uploadedImageURL =
             result.url;
