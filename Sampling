@@ -1,0 +1,1039 @@
+<body>
+
+<div id="app">
+
+    <!-- ================= HOME ================= -->
+
+    <section id="homePage" class="page active">
+
+        <div class="card">
+
+            <h1>📸 Sampling 2026</h1>
+
+            <p class="subtitle">
+                Hệ thống Check-in / Check-out Sampling
+            </p>
+
+            <button id="btnPhoto">
+                📷 Chụp ảnh
+            </button>
+
+            <button id="btnReport">
+                📝 Báo cáo
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= PHOTO MENU ================= -->
+
+    <section id="photoMenu" class="page">
+
+        <div class="card">
+
+            <h2>Chọn loại chụp</h2>
+
+            <button id="btnCheckIn">
+                🟢 Check-in
+            </button>
+
+            <button id="btnCheckOut">
+                🔴 Check-out
+            </button>
+
+            <button class="btnBack">
+                ⬅ Quay lại
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= REPORT MENU ================= -->
+
+    <section id="reportMenu" class="page">
+
+        <div class="card">
+
+            <h2>Chọn loại báo cáo</h2>
+
+            <button id="btnReportCheckIn">
+                🟢 Báo cáo Check-in
+            </button>
+
+            <button id="btnReportCheckOut">
+                🔴 Báo cáo Check-out
+            </button>
+
+            <button class="btnBack">
+                ⬅ Quay lại
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= STORE ================= -->
+
+    <section id="storePage" class="page">
+
+        <div class="card">
+
+            <h2 id="storeTitle">
+
+            </h2>
+
+            <label>
+
+                Mã điểm bán
+
+            </label>
+
+            <input
+
+                id="storeCode"
+
+                type="text"
+
+                autocomplete="off"
+
+                placeholder="Ví dụ: TNI007701"
+
+            >
+
+            <label>
+
+                Chọn Camera
+
+            </label>
+
+            <select id="cameraSelect">
+
+                <option value="environment">
+
+                    📷 Camera sau
+
+                </option>
+
+                <option value="user">
+
+                    🤳 Camera trước
+
+                </option>
+
+            </select>
+
+            <button id="btnOpenCamera">
+
+                Tiếp tục
+
+            </button>
+
+            <button class="btnBack">
+
+                ⬅ Quay lại
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= CAMERA ================= -->
+
+    <section id="cameraPage" class="page camera-page">
+
+        <video
+
+            id="video"
+
+            autoplay
+
+            playsinline
+
+        ></video>
+
+        <canvas
+
+            id="canvas"
+
+            style="display:none"
+
+        ></canvas>
+
+        <img
+
+            id="preview"
+
+        >
+
+        <div class="cameraToolbar">
+
+            <button id="btnSwitchCamera">
+
+                🔄
+
+            </button>
+
+            <button id="btnCapture">
+
+                📷
+
+            </button>
+
+            <button id="btnCancelCamera">
+
+                ❌
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= PREVIEW ================= -->
+
+    <section id="previewPage" class="page">
+
+        <div class="card">
+
+            <h2>
+
+                Xem lại ảnh
+
+            </h2>
+
+            <img id="previewImage">
+
+            <button id="btnRetake">
+
+                🔄 Chụp lại
+
+            </button>
+
+            <button id="btnUpload">
+
+                ⬆ Lưu ảnh
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= FINISH ================= -->
+
+    <section id="finishPage" class="page">
+
+        <div class="card">
+
+            <h2>
+
+                ✅ Ảnh đã lưu
+
+            </h2>
+
+            <button id="btnFinish">
+
+                ✔ Lưu hình và kết thúc
+
+            </button>
+
+            <button id="btnContinueReport">
+
+                📝 Lưu hình và tiếp tục báo cáo
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================= LOADING ================= -->
+
+    <section id="loadingPage" class="page">
+
+        <div class="card">
+
+            <h2>
+
+                Đang lưu ảnh...
+
+            </h2>
+
+            <div class="loader"></div>
+
+            <p>
+
+                Vui lòng không đóng trình duyệt
+
+            </p>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+/* ==========================
+   RESET
+========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,
+body{
+
+    width:100%;
+    height:100%;
+
+    background:#f6f6f6;
+
+    overflow:hidden;
+
+    font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
+}
+
+
+/* ==========================
+   PAGE
+========================== */
+
+#app{
+
+    width:100%;
+    height:100%;
+
+    position:relative;
+
+}
+
+.page{
+
+    position:absolute;
+
+    inset:0;
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+
+    background:#f6f6f6;
+
+}
+
+.page.active{
+
+    display:flex;
+
+}
+
+
+/* ==========================
+   CARD
+========================== */
+
+.card{
+
+    width:100%;
+
+    max-width:420px;
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:28px;
+
+    box-shadow:
+
+    0 10px 30px rgba(0,0,0,.08);
+
+}
+
+.card h1{
+
+    text-align:center;
+
+    font-size:30px;
+
+    margin-bottom:10px;
+
+    color:#222;
+
+}
+
+.card h2{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+    color:#222;
+
+}
+
+.subtitle{
+
+    text-align:center;
+
+    color:#666;
+
+    margin-bottom:30px;
+
+}
+
+
+/* ==========================
+   INPUT
+========================== */
+
+label{
+
+    display:block;
+
+    margin-top:15px;
+
+    margin-bottom:8px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#555;
+
+}
+
+input,
+select{
+
+    width:100%;
+
+    height:52px;
+
+    border-radius:14px;
+
+    border:1px solid #ddd;
+
+    padding:0 16px;
+
+    font-size:16px;
+
+    outline:none;
+
+    background:white;
+
+}
+
+input:focus,
+select:focus{
+
+    border-color:#ff6b00;
+
+}
+
+
+/* ==========================
+   BUTTON
+========================== */
+
+button{
+
+    width:100%;
+
+    height:56px;
+
+    margin-top:18px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:#ff6b00;
+
+    color:white;
+
+    font-size:17px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+button:active{
+
+    transform:scale(.98);
+
+}
+
+button:disabled{
+
+    opacity:.5;
+
+}
+
+
+/* ==========================
+   BACK BUTTON
+========================== */
+
+.btnBack{
+
+    background:#9e9e9e;
+
+}
+
+
+/* ==========================
+   CAMERA
+========================== */
+
+.camera-page{
+
+    background:black;
+
+    padding:0;
+
+}
+
+#video{
+
+    width:100vw;
+
+    height:100vh;
+
+    object-fit:cover;
+
+    background:black;
+
+}
+
+#preview{
+
+    display:none;
+
+    width:100vw;
+
+    height:100vh;
+
+    object-fit:contain;
+
+    background:black;
+
+}
+
+
+/* ==========================
+   CAMERA TOOLBAR
+========================== */
+
+.cameraToolbar{
+
+    position:fixed;
+
+    left:0;
+
+    right:0;
+
+    bottom:30px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:18px;
+
+    z-index:100;
+
+}
+.cameraToolbar button{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    margin:0;
+    font-size:28px;
+}
+#btnCapture{
+    width:90px;
+    height:90px;
+    font-size:34px;
+}
+/* ==========================
+   PREVIEW
+========================== */
+#previewImage{
+
+    width:100%;
+
+    border-radius:18px;
+
+    margin-bottom:20px;
+}
+/* ==========================
+   LOADER
+========================== */
+
+.loader{
+
+    width:70px;
+
+    height:70px;
+
+    border-radius:50%;
+
+    border:6px solid #ddd;
+
+    border-top-color:#ff6b00;
+
+    margin:25px auto;
+
+    animation:spin .8s linear infinite;
+
+}
+@keyframes spin{
+    from{
+        transform:rotate(0deg);
+    }
+    to{
+
+        transform:rotate(360deg);
+    }
+}
+/* ==========================
+   MESSAGE
+========================== */
+
+.msg{
+
+    margin-top:15px;
+
+    text-align:center;
+
+    color:#666;
+
+    line-height:1.5;
+
+}
+
+
+/* ==========================
+   SUCCESS
+========================== */
+
+.success{
+
+    color:#2e7d32;
+
+}
+
+.error{
+
+    color:#d32f2f;
+
+}
+/* ==========================
+   MOBILE SAFE AREA
+========================== */
+@supports(padding:max(0px)){
+.cameraToolbar{
+padding-bottom:max(20px,env(safe-area-inset-bottom));
+}
+}
+/* ==========================
+   IPHONE FIX
+========================== */
+video{
+    transform:scaleX(1);
+    -webkit-transform:scaleX(1);
+}
+body{
+    overscroll-behavior:none;
+}
+
+/* ==========================
+   FADE ANIMATION
+========================== */
+.page{
+    animation:fade .25s;
+}
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+//=========================
+// PAGE CONTROLLER
+//=========================
+
+let currentMode = ""; // checkin | checkout
+
+function showPage(id){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(p=>p.classList.remove("active"));
+
+    document
+        .getElementById(id)
+        .classList.add("active");
+
+}
+//=========================
+// HOME
+//=========================
+document.getElementById("btnPhoto").onclick = ()=>{
+    showPage("photoMenu");
+};
+document.getElementById("btnReport").onclick = ()=>{
+    showPage("reportMenu");
+};
+//=========================
+// PHOTO MENU
+//=========================
+document.getElementById("btnCheckIn").onclick = ()=>{
+    currentMode = "checkin";
+    document.getElementById("storeTitle").innerHTML =
+        "📷 Check-in";
+    showPage("storePage");
+};
+document.getElementById("btnCheckOut").onclick = ()=>{
+    currentMode = "checkout";
+    document.getElementById("storeTitle").innerHTML =
+        "📷 Check-out";
+    showPage("storePage");
+};
+//=========================
+// REPORT MENU
+//=========================
+document.getElementById("btnReportCheckIn").onclick = ()=>{
+    location.href = CHECKIN_FORM;
+};
+document.getElementById("btnReportCheckOut").onclick = ()=>{
+    location.href = CHECKOUT_FORM;
+};
+//=========================
+// BACK BUTTON
+//=========================
+document
+.querySelectorAll(".btnBack")
+.forEach(btn=>{
+    btn.onclick=()=>{
+        if(
+            document
+            .getElementById("photoMenu")
+            .classList
+            .contains("active")
+        ){
+            showPage("homePage");
+            return;
+        }
+        if(
+            document
+            .getElementById("reportMenu")
+            .classList
+            .contains("active")
+        ){
+            showPage("homePage");
+            return;
+        }
+        if(
+            document
+            .getElementById("storePage")
+            .classList
+            .contains("active")
+        ){
+            showPage("photoMenu");
+            return;
+        }
+    };
+});
+//=========================
+// STORE PAGE + CAMERA
+//=========================
+
+let stream = null;
+let currentCamera = "environment";
+let capturedImage = "";
+let storeCodeValue = "";
+
+
+//=========================
+// OPEN CAMERA BUTTON
+//=========================
+
+document.getElementById("btnOpenCamera").onclick = ()=>{
+    let code = document
+        .getElementById("storeCode")
+        .value
+        .trim();
+    if(code === ""){
+        alert("Vui lòng nhập mã điểm bán");
+        return;
+    }
+    storeCodeValue = code;
+    currentCamera =
+        document
+        .getElementById("cameraSelect")
+        .value;
+    openCamera();
+};
+//=========================
+// START CAMERA
+//=========================
+async function openCamera(){
+    try{
+        // tắt camera cũ nếu có
+        if(stream){
+            stream
+            .getTracks()
+            .forEach(track=>{
+                track.stop();
+            });
+        }
+        stream =
+        await navigator
+        .mediaDevices
+        .getUserMedia({
+            video:{
+                facingMode:{
+                    exact:
+                    currentCamera
+                }
+            },
+            audio:false
+        });
+        document
+        .getElementById("video")
+        .srcObject = stream;
+        showPage("cameraPage");
+    }
+    catch(error){
+        console.log(error);
+        alert(
+            "Không mở được camera. Vui lòng cấp quyền camera."
+        );
+    }
+}
+//=========================
+// SWITCH CAMERA
+//=========================
+document
+.getElementById("btnSwitchCamera")
+.onclick = ()=>{
+    if(currentCamera==="environment"){
+        currentCamera="user";
+    }
+    else{
+        currentCamera="environment";
+    }
+    openCamera();
+};
+//=========================
+// CAPTURE IMAGE
+//=========================
+document
+.getElementById("btnCapture")
+.onclick = ()=>{
+    let video =
+    document.getElementById("video");
+    let canvas =
+    document.getElementById("canvas");
+    canvas.width =
+    video.videoWidth;
+    canvas.height =
+    video.videoHeight;
+    let ctx =
+    canvas.getContext("2d");
+    ctx.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+    capturedImage =
+    canvas.toDataURL(
+        "image/jpeg",
+        0.9
+    );
+    stopCamera();
+    document
+    .getElementById("previewImage")
+    .src =
+    capturedImage;
+    showPage("previewPage");
+};
+//=========================
+// STOP CAMERA
+//=========================
+
+function stopCamera(){
+    if(stream){
+        stream
+        .getTracks()
+        .forEach(track=>{
+            track.stop();
+        });
+        stream=null;
+    }
+}
+//=========================
+// CANCEL CAMERA
+//=========================
+document
+.getElementById("btnCancelCamera")
+.onclick = ()=>{
+    stopCamera();
+    showPage("storePage");
+};
+//=========================
+// RETAKE PHOTO
+//=========================
+document
+.getElementById("btnRetake")
+.onclick = ()=>{
+    openCamera();
+};
+//=========================
+// UPLOAD BUTTON
+//=========================
+document
+.getElementById("btnUpload")
+.onclick = ()=>{
+    showPage("loadingPage");
+    uploadImage();
+};
+//=========================
+// CONFIG
+//=========================
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk5-ZfyGQ0ohlZjwa_sRuXBZ4vxzbw0uwpq9fSQ6MZgADzFX6lfWeY3fA7w-juRRWd/exec";
+const CHECKIN_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSchaY-0UJIstKxnNRIDgE-bx7VAiDP1DLWn2TItWad7qzOP8A/viewform?usp=dialog";
+const CHECKOUT_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSe-f946yjSe9lr6iVp4kzvzGHGlHxHzg-uhOyJpzuleh-raLQ/viewform?usp=dialog";
+let uploadedImageURL = "";
+//=========================
+// UPLOAD IMAGE TO DRIVE
+//=========================
+async function uploadImage(){
+    try{
+        let payload = {
+            image:
+            capturedImage,
+            storeCode:
+            storeCodeValue,
+            type:
+            currentMode,
+            time:
+            new Date()
+            .toISOString()
+        };
+        let response =
+        await fetch(
+            SCRIPT_URL,
+            {
+                method:"POST",
+                body:
+                JSON.stringify(payload)
+            }
+        );
+        let result =
+        await response.json();
+        console.log(result);
+        if(result.status==="success"){
+            uploadedImageURL =
+            result.url;
+            showPage(
+                "finishPage"
+            );
+        }
+        else{
+            alert(
+                "Lưu ảnh thất bại"
+            );
+            showPage(
+                "previewPage"
+            );
+        }
+    }
+    catch(error){
+        console.log(error);
+        alert(
+            "Có lỗi khi upload ảnh"
+        );
+        showPage(
+            "previewPage"
+        );
+    }
+}
+//=========================
+// FINISH BUTTON
+//=========================
+document
+.getElementById("btnFinish")
+.onclick = ()=>{
+    uploadedImageURL="";
+    capturedImage="";
+    storeCodeValue="";
+    showPage(
+        "homePage"
+    );
+};
+//=========================
+// CONTINUE REPORT
+//=========================
+document
+.getElementById("btnContinueReport")
+.onclick = ()=>{
+    let url="";
+    if(currentMode==="checkin"){
+        url =
+        CHECKIN_FORM;
+    }
+    else{
+        url =
+        CHECKOUT_FORM;
+    }
+    window.location.href =
+    url;
+};
