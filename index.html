@@ -45,12 +45,9 @@
         display:flex;
     }
 
-    /* THEME BACKGROUNDS */
-    .page-checkin {
-        background: #f0f4f8; /* Xanh dương nhẹ */
-    }
+    /* THEME BACKGROUNDS (Chỉ áp dụng nền tối nhẹ cho Check-out, Check-in giữ nền mặc định) */
     .page-checkout {
-        background: #2a2f35; /* Tối nhẹ */
+        background: #2a2f35;
     }
 
     /* ==========================
@@ -267,7 +264,8 @@
             <p class="subtitle">
                 Hệ thống Check-in / Check-out Sampling
             </p>
-            <button id="btnHomeCheckIn" style="background: #2b7de9;">
+            <!-- Nút Check-in màu xanh dương pastel nhẹ nhàng, chữ tối màu hoặc sáng dịu -->
+            <button id="btnHomeCheckIn" style="background: #e1ecfd; color: #1d4ed8;">
                 ☀️ Check-in
             </button>
             <button id="btnHomeCheckOut" style="background: #3c444c;">
@@ -321,7 +319,7 @@
                     🤳 Camera trước
                 </option>
             </select>
-            <button id="btnOpenCamera" style="background: #ff6b00;" class="btnActionTheme">
+            <button id="btnOpenCamera" class="btnActionTheme">
                 Tiếp tục
             </button>
             <button class="btnBack">
@@ -409,30 +407,29 @@ function showPage(id, mode = ""){
         .querySelectorAll(".page")
         .forEach(p=>{
             p.classList.remove("active");
-            p.classList.remove("page-checkin");
             p.classList.remove("page-checkout");
         });
 
     let targetPage = document.getElementById(id);
     targetPage.classList.add("active");
 
-    // Áp dụng background động theo chế độ Check-in / Check-out
     let activeMode = mode || currentMode;
+    // Check-in không đổi màu nền (giữ nguyên mặc định như không có), chỉ Check-out mới chuyển sang nền tối nhẹ
     if(id === "storePage" || id === "previewPage" || id === "finishPage"){
-        if(activeMode === "CHECKIN"){
-            targetPage.classList.add("page-checkin");
-        } else if(activeMode === "CHECKOUT"){
+        if(activeMode === "CHECKOUT"){
             targetPage.classList.add("page-checkout");
         }
     }
 
-    // Đổi màu các nút hành động chính theo theme (Xanh dương cho Check-in, Tối nhẹ cho Check-out)
+    // Đổi màu các nút hành động (Check-in dùng xanh dương pastel/dịu mắt, Check-out dùng tối nhẹ)
     let actionButtons = targetPage.querySelectorAll(".btnActionTheme");
     actionButtons.forEach(btn => {
         if(activeMode === "CHECKIN"){
-            btn.style.background = "#2b7de9";
+            btn.style.background = "#3b82f6";
+            btn.style.color = "#ffffff";
         } else if(activeMode === "CHECKOUT"){
             btn.style.background = "#414952";
+            btn.style.color = "#ffffff";
         }
     });
 }
@@ -440,7 +437,6 @@ function showPage(id, mode = ""){
 // Xử lý sự kiện từ màn hình chính chuyển sang Check-in
 document.getElementById("btnHomeCheckIn").onclick = ()=>{
     currentMode = "CHECKIN";
-    document.getElementById("storeTitleinnerHTML") // Giữ nguyên
     document.getElementById("storeTitle").innerHTML = "☀️ Check-in";
     document.getElementById("reportDateGroup").style.display = "none"; 
     showPage("storePage", "CHECKIN");
@@ -452,7 +448,6 @@ document.getElementById("btnHomeCheckOut").onclick = ()=>{
     document.getElementById("storeTitle").innerHTML = "🌙 Check-out";
     document.getElementById("reportDateGroup").style.display = "block"; 
     
-    // Mặc định gán ngày hôm nay vào ô chọn ngày
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("reportDate").value = today;
 
