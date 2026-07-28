@@ -44,6 +44,15 @@
     .page.active{
         display:flex;
     }
+
+    /* THEME BACKGROUNDS */
+    .page-checkin {
+        background: #f0f4f8; /* Xanh dương nhẹ */
+    }
+    .page-checkout {
+        background: #2a2f35; /* Tối nhẹ */
+    }
+
     /* ==========================
         CARD (Responsive Mobile)
     ========================== */
@@ -258,11 +267,11 @@
             <p class="subtitle">
                 Hệ thống Check-in / Check-out Sampling
             </p>
-            <button id="btnHomeCheckIn">
-                ☀️ Check-in (Ban ngày)
+            <button id="btnHomeCheckIn" style="background: #2b7de9;">
+                ☀️ Check-in
             </button>
-            <button id="btnHomeCheckOut" style="background: #2c3e50;">
-                🌙 Check-out (Ban đêm)
+            <button id="btnHomeCheckOut" style="background: #3c444c;">
+                🌙 Check-out
             </button>
         </div>
     </section>
@@ -312,7 +321,7 @@
                     🤳 Camera trước
                 </option>
             </select>
-            <button id="btnOpenCamera">
+            <button id="btnOpenCamera" style="background: #ff6b00;" class="btnActionTheme">
                 Tiếp tục
             </button>
             <button class="btnBack">
@@ -359,7 +368,7 @@
             <button id="btnRetake">
                 🔄 Chụp lại
             </button>
-            <button id="btnUpload">
+            <button id="btnUpload" class="btnActionTheme">
                 ⬆ Lưu ảnh
             </button>
         </div>
@@ -370,7 +379,7 @@
             <h2>
                 ✅ Ảnh đã lưu
             </h2>
-            <button id="btnFinish">
+            <button id="btnFinish" class="btnActionTheme">
                 ✔ Lưu hình và kết thúc
             </button>
             <button id="btnContinueReport">
@@ -395,34 +404,59 @@
 <script>
 let currentMode = "";
 
-function showPage(id){
+function showPage(id, mode = ""){
     document
         .querySelectorAll(".page")
-        .forEach(p=>p.classList.remove("active"));
+        .forEach(p=>{
+            p.classList.remove("active");
+            p.classList.remove("page-checkin");
+            p.classList.remove("page-checkout");
+        });
 
-    document
-        .getElementById(id)
-        .classList.add("active");
+    let targetPage = document.getElementById(id);
+    targetPage.classList.add("active");
+
+    // Áp dụng background động theo chế độ Check-in / Check-out
+    let activeMode = mode || currentMode;
+    if(id === "storePage" || id === "previewPage" || id === "finishPage"){
+        if(activeMode === "CHECKIN"){
+            targetPage.classList.add("page-checkin");
+        } else if(activeMode === "CHECKOUT"){
+            targetPage.classList.add("page-checkout");
+        }
+    }
+
+    // Đổi màu các nút hành động chính theo theme (Xanh dương cho Check-in, Tối nhẹ cho Check-out)
+    let actionButtons = targetPage.querySelectorAll(".btnActionTheme");
+    actionButtons.forEach(btn => {
+        if(activeMode === "CHECKIN"){
+            btn.style.background = "#2b7de9";
+        } else if(activeMode === "CHECKOUT"){
+            btn.style.background = "#414952";
+        }
+    });
 }
 
-// Xử lý sự kiện từ màn hình chính trực tiếp nhảy thẳng vào điền thông tin Check-in / Check-out
+// Xử lý sự kiện từ màn hình chính chuyển sang Check-in
 document.getElementById("btnHomeCheckIn").onclick = ()=>{
     currentMode = "CHECKIN";
-    document.getElementById("storeTitle").innerHTML = "☀️ Check-in (Ban ngày)";
+    document.getElementById("storeTitleinnerHTML") // Giữ nguyên
+    document.getElementById("storeTitle").innerHTML = "☀️ Check-in";
     document.getElementById("reportDateGroup").style.display = "none"; 
-    showPage("storePage");
+    showPage("storePage", "CHECKIN");
 };
 
+// Xử lý sự kiện từ màn hình chính chuyển sang Check-out
 document.getElementById("btnHomeCheckOut").onclick = ()=>{
     currentMode = "CHECKOUT";
-    document.getElementById("storeTitle").innerHTML = "🌙 Check-out (Ban đêm)";
+    document.getElementById("storeTitle").innerHTML = "🌙 Check-out";
     document.getElementById("reportDateGroup").style.display = "block"; 
     
     // Mặc định gán ngày hôm nay vào ô chọn ngày
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("reportDate").value = today;
 
-    showPage("storePage");
+    showPage("storePage", "CHECKOUT");
 };
 
 document.querySelectorAll(".btnBack").forEach(btn=>{
@@ -551,7 +585,7 @@ function handleCapture(e) {
     stopCamera();
     
     document.getElementById("previewImage").src = capturedImage;
-    showPage("previewPage");
+    showPage("previewPage", currentMode);
 }
 
 let captureBtn = document.getElementById("btnCapture");
@@ -570,7 +604,7 @@ function stopCamera(){
 
 document.getElementById("btnCancelCamera").onclick = ()=>{
     stopCamera();
-    showPage("storePage");
+    showPage("storePage", currentMode);
 };
 
 document.getElementById("btnRetake").onclick = ()=>{
@@ -650,16 +684,16 @@ async function uploadImage(){
         }
 
         if(result.success === true){
-            showPage("finishPage");
+            showPage("finishPage", currentMode);
         } else {
             alert("Lưu ảnh thất bại: " + result.error);
-            showPage("previewPage");
+            showPage("previewPage", currentMode);
         }
     }
     catch(error){
         console.log(error);
         alert("Có lỗi khi upload ảnh");
-        showPage("previewPage");
+        showPage("previewPage", currentMode);
     }
 }
 
