@@ -75,7 +75,7 @@
         margin-bottom:20px;
     }
     /* ==========================
-        INPUT & SELECT (To, dễ bấm)
+        INPUT & SELECT
     ========================== */
     label{
         display:block;
@@ -101,7 +101,7 @@
         border-color:#ff6b00;
     }
     /* ==========================
-        BUTTON (To, dễ chạm trên mobile)
+        BUTTON
     ========================== */
     button{
         width:100%;
@@ -115,6 +115,7 @@
         font-weight:700;
         cursor:pointer;
         transition:.2s;
+        -webkit-appearance: none;
     }
     button:active{
         transform:scale(.97);
@@ -122,9 +123,6 @@
     button:disabled{
         opacity:.5;
     }
-    /* ==========================
-        BACK BUTTON
-    ========================== */
     .btnBack{
         background:#9e9e9e;
     }
@@ -148,9 +146,24 @@
         object-fit:contain;
         background:black;
     }
-    /* ==========================
-        CAMERA TOOLBAR
-    ========================== */
+    
+    .cameraGuideBanner {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.65);
+        color: #ffeb3b;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        z-index: 101;
+        text-align: center;
+        border: 1px solid rgba(255, 235, 59, 0.4);
+        pointer-events: none;
+    }
+
     .cameraToolbar{
         position:fixed;
         left:0;
@@ -176,6 +189,9 @@
         width:80px;
         height:80px;
         font-size:32px;
+        background: #fff;
+        color: #000;
+        border: 4px solid #ff6b00;
     }
     /* ==========================
         PREVIEW
@@ -203,32 +219,14 @@
         from{ transform:rotate(0deg); }
         to{ transform:rotate(360deg); }
     }
-    /* ==========================
-        MESSAGE
-    ========================== */
-    .msg{
-        margin-top:12px;
-        text-align:center;
-        color:#666;
-        line-height:1.4;
-    }
-    .success{
-        color:#2e7d32;
-    }
-    .error{
-        color:#d32f2f;
-    }
-    /* ==========================
-        MOBILE SAFE AREA
-    ========================== */
     @supports(padding:max(0px)){
     .cameraToolbar{
         padding-bottom:max(16px,env(safe-area-inset-bottom));
     }
+    .cameraGuideBanner {
+        top: max(20px, env(safe-area-inset-top));
     }
-    /* ==========================
-        IPHONE FIX
-    ========================== */
+    }
     video{
         transform:scaleX(1);
         -webkit-transform:scaleX(1);
@@ -236,9 +234,6 @@
     body{
         overscroll-behavior:none;
     }
-    /* ==========================
-        FADE ANIMATION
-    ========================== */
     .page{
         animation:fade .2s;
     }
@@ -346,10 +341,13 @@
     </section>
     <!-- ================= CAMERA ================= -->
     <section id="cameraPage" class="page camera-page">
+        <div class="cameraGuideBanner">📷 Đang ở chế độ CHỤP ẢNH (Bấm nút tròn để chụp)</div>
+
         <video
             id="video"
             autoplay
             playsinline
+            muted
         ></video>
         <canvas
             id="canvas"
@@ -359,13 +357,13 @@
             id="preview"
         >
         <div class="cameraToolbar">
-            <button id="btnSwitchCamera">
+            <button id="btnSwitchCamera" title="Đổi camera" type="button">
                 🔄
             </button>
-            <button id="btnCapture">
-                📷
+            <button id="btnCapture" title="Chụp ảnh" type="button">
+                📸
             </button>
-            <button id="btnCancelCamera">
+            <button id="btnCancelCamera" title="Hủy" type="button">
                 ❌
             </button>
         </div>
@@ -414,11 +412,7 @@
 </div>
 
 <script>
-//=========================
-// PAGE CONTROLLER
-//=========================
-
-let currentMode = ""; // checkin | checkout
+let currentMode = "";
 
 function showPage(id){
     document
@@ -429,78 +423,53 @@ function showPage(id){
         .getElementById(id)
         .classList.add("active");
 }
-//=========================
-// HOME
-//=========================
+
 document.getElementById("btnPhoto").onclick = ()=>{
     showPage("photoMenu");
 };
 document.getElementById("btnReport").onclick = ()=>{
     showPage("reportMenu");
 };
-//=========================
-// PHOTO MENU
-//=========================
+
 document.getElementById("btnCheckIn").onclick = ()=>{
     currentMode = "CHECKIN";
-    document.getElementById("storeTitle").innerHTML =
-        "📷 Check-in";
+    document.getElementById("storeTitle").innerHTML = "📷 Check-in";
     showPage("storePage");
 };
 document.getElementById("btnCheckOut").onclick = ()=>{
     currentMode = "CHECKOUT";
-    document.getElementById("storeTitle").innerHTML =
-        "📷 Check-out";
+    document.getElementById("storeTitle").innerHTML = "📷 Check-out";
     showPage("storePage");
 };
-//=========================
-// REPORT MENU
-//=========================
+
 document.getElementById("btnReportCheckIn").onclick = ()=>{
     location.href = CHECKIN_FORM;
 };
 document.getElementById("btnReportCheckOut").onclick = ()=>{
     location.href = CHECKOUT_FORM;
 };
-//=========================
-// BACK BUTTON
-//=========================
-document
-.querySelectorAll(".btnBack")
-.forEach(btn=>{
+
+document.querySelectorAll(".btnBack").forEach(btn=>{
     btn.onclick=()=>{
-        if(
-            document
-            .getElementById("photoMenu")
-            .classList
-            .contains("active")
-        ){
+        if(document.getElementById("photoMenu").classList.contains("active") ||
+           document.getElementById("reportMenu").classList.contains("active")){
             showPage("homePage");
             return;
         }
-        if(
-            document
-            .getElementById("reportMenu")
-            .classList
-            .contains("active")
-        ){
-            showPage("homePage");
-            return;
-        }
-        if(
-            document
-            .getElementById("storePage")
-            .classList
-            .contains("active")
-        ){
+        if(document.getElementById("storePage").classList.contains("active")){
             showPage("photoMenu");
             return;
         }
     };
 });
-//=========================
-// STORE PAGE + CAMERA
-//=========================
+
+// Auto uppercase storeCode and restrict
+document.getElementById("storeCode").addEventListener("input", function (e) {
+    let start = this.selectionStart;
+    let end = this.selectionEnd;
+    this.value = this.value.toUpperCase();
+    this.setSelectionRange(start, end);
+});
 
 let stream = null;
 let currentCamera = "environment";
@@ -508,206 +477,123 @@ let capturedImage = "";
 let storeCodeValue = "";
 let pssNameValue = "";
 
-//=========================
-// OPEN CAMERA BUTTON
-//=========================
-
 document.getElementById("btnOpenCamera").onclick = ()=>{
-    let pss = document
-        .getElementById("pssName")
-        .value
-        .trim();
-    let code = document
-        .getElementById("storeCode")
-        .value
-        .trim()
-        .toUpperCase(); // Ép luôn chữ hoa
+    let pss = document.getElementById("pssName").value.trim();
+    let code = document.getElementById("storeCode").value.trim().toUpperCase();
         
     if(pss === ""){
         alert("Vui lòng nhập tên PSS");
+        document.getElementById("pssName").focus();
         return;
     }
     if(code === ""){
         alert("Vui lòng nhập mã điểm bán");
+        document.getElementById("storeCode").focus();
         return;
     }
-
-    // ==========================================
-    // RÀNG BUỘC ĐIỀU KIỆN MÃ ĐIỂM BÁN TẠI ĐÂY
-    // ==========================================
-    // Ví dụ 1: Kiểm tra độ dài phải từ 5 ký tự trở lên (sửa số tùy ý bạn)
+    
+    // Ràng buộc kiểm tra mã điểm bán tối thiểu 5 ký tự
     if(code.length < 5){
         alert("Mã điểm bán không hợp lệ! Mã phải có ít nhất 5 ký tự.");
         document.getElementById("storeCode").focus();
         return;
     }
-
-    /* 
-      Ví dụ 2 (Nâng cao): Nếu mã của bạn phải theo mẫu chữ cái đầu rồi đến số 
-      (Ví dụ: TNI001, ABC1234,...), bạn có thể dùng Regex kiểm tra mẫu:
-      
-      const storeCodeRegex = /^[A-Z0-9]{5,15}$/; // Chỉ gồm chữ và số, dài từ 5-15 ký tự
-      if(!storeCodeRegex.test(code)){
-          alert("Mã điểm bán sai định dạng! Vui lòng kiểm tra lại.");
-          document.getElementById("storeCode").focus();
-          return;
-      }
-    */
-    // ==========================================
-
-    pssNameValue = pss;
-    storeCodeValue = code;
-    currentCamera =
-        document
-        .getElementById("cameraSelect")
-        .value;
-    openCamera();
-};
     
     pssNameValue = pss;
     storeCodeValue = code;
-    currentCamera =
-        document
-        .getElementById("cameraSelect")
-        .value;
+    currentCamera = document.getElementById("cameraSelect").value;
     openCamera();
 };
-//=========================
-// START CAMERA
-//=========================
+
 async function openCamera(){
     try{
         if(stream){
-            stream
-            .getTracks()
-            .forEach(track=>{
-                track.stop();
-            });
+            stream.getTracks().forEach(track=>track.stop());
         }
-        stream =
-        await navigator
-        .mediaDevices
-        .getUserMedia({
+        stream = await navigator.mediaDevices.getUserMedia({
             video:{
-                facingMode:{
-                    ideal:
-                    currentCamera
-                }
+                facingMode:{ ideal: currentCamera }
             },
             audio:false
         });
-        document
-        .getElementById("video")
-        .srcObject = stream;
+        let videoElement = document.getElementById("video");
+        videoElement.srcObject = stream;
+        await videoElement.play().catch(e => console.log("Video play error:", e));
+
         showPage("cameraPage");
     }
     catch(error){
         console.log(error);
-        alert(
-            "Không mở được camera. Vui lòng cấp quyền camera."
-        );
+        alert("Không mở được camera. Vui lòng kiểm tra lại quyền truy cập camera trên thiết bị của bạn.");
     }
 }
-//=========================
-// SWITCH CAMERA
-//=========================
-document
-.getElementById("btnSwitchCamera")
-.onclick = ()=>{
-    if(currentCamera==="environment"){
-        currentCamera="user";
-    }
-    else{
-        currentCamera="environment";
-    }
+
+document.getElementById("btnSwitchCamera").onclick = ()=>{
+    currentCamera = (currentCamera === "environment") ? "user" : "environment";
     openCamera();
 };
-//=========================
-// CAPTURE IMAGE
-//=========================
-document
-.getElementById("btnCapture")
-.onclick = ()=>{
-    let video =
-    document.getElementById("video");
-    let canvas =
-    document.getElementById("canvas");
-    canvas.width =
-    video.videoWidth;
-    canvas.height =
-    video.videoHeight;
-    let ctx =
-    canvas.getContext("2d");
-    ctx.drawImage(
-        video,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-    capturedImage =
-    canvas.toDataURL(
-        "image/jpeg",
-        0.9
-    );
+
+// FIX FOR XIAOMI (MIUI / Mi Browser / Chrome): Use both click and touchend handlers for capture button
+function handleCapture(e) {
+    if(e) e.preventDefault();
+    
+    let video = document.getElementById("video");
+    let canvas = document.getElementById("canvas");
+    
+    // Fallback dimensions if videoWidth is 0 on Xiaomi
+    let width = video.videoWidth || video.clientWidth || window.innerWidth;
+    let height = video.videoHeight || video.clientHeight || window.innerHeight;
+    
+    canvas.width = width;
+    canvas.height = height;
+    
+    let ctx = canvas.getContext("2d");
+    try {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    } catch(err) {
+        console.log("Canvas drawImage error:", err);
+    }
+    
+    capturedImage = canvas.toDataURL("image/jpeg", 0.85);
+    
     stopCamera();
-    document
-    .getElementById("previewImage")
-    .src =
-    capturedImage;
+    
+    document.getElementById("previewImage").src = capturedImage;
     showPage("previewPage");
+}
+
+let captureBtn = document.getElementById("btnCapture");
+captureBtn.onclick = handleCapture;
+captureBtn.ontouchend = (e) => {
+    e.preventDefault();
+    handleCapture(e);
 };
-//=========================
-// STOP CAMERA
-//=========================
 
 function stopCamera(){
     if(stream){
-        stream
-        .getTracks()
-        .forEach(track=>{
-            track.stop();
-        });
-        stream=null;
+        stream.getTracks().forEach(track=>track.stop());
+        stream = null;
     }
 }
-//=========================
-// CANCEL CAMERA
-//=========================
-document
-.getElementById("btnCancelCamera")
-.onclick = ()=>{
+
+document.getElementById("btnCancelCamera").onclick = ()=>{
     stopCamera();
     showPage("storePage");
 };
-//=========================
-// RETAKE PHOTO
-//=========================
-document
-.getElementById("btnRetake")
-.onclick = ()=>{
+
+document.getElementById("btnRetake").onclick = ()=>{
     openCamera();
 };
-//=========================
-// UPLOAD BUTTON
-//=========================
-document
-.getElementById("btnUpload")
-.onclick = ()=>{
+
+document.getElementById("btnUpload").onclick = ()=>{
     showPage("loadingPage");
     uploadImage();
 };
-//=========================
-// CONFIG
-//=========================
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQa4AAsZU9gPnvU9z8z0F9dl6cP38ALx_yhwPqLUdMu9SQatQyiHDoQuYh0d823uhJ/exec";
 const CHECKIN_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSchaY-0UJIstKxnNRIDgE-bx7VAiDP1DLWn2TItWad7qzOP8A/viewform?usp=dialog";
 const CHECKOUT_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSe-f946yjSe9lr6iVp4kzvzGHGlHxHzg-uhOyJpzuleh-raLQ/viewform?usp=dialog";
-let uploadedImageURL = "";
 
-//=========================
-// GET DEVICE INFO
-//=========================
 function getDeviceInfo() {
     const ua = navigator.userAgent;
     let browser = "Unknown";
@@ -742,9 +628,6 @@ function getDeviceInfo() {
     return { device, browser };
 }
 
-//=========================
-// UPLOAD IMAGE TO DRIVE
-//=========================
 async function uploadImage(){
     try{
         const info = getDeviceInfo();
@@ -759,16 +642,13 @@ async function uploadImage(){
             time: new Date().toISOString()
         };
 
-        let response = await fetch(
-          SCRIPT_URL,
-          {
+        let response = await fetch(SCRIPT_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "text/plain;charset=utf-8"
             },
             body: JSON.stringify(payload)
-          }
-        );
+        });
 
         let result = await response.json();
         
@@ -777,7 +657,6 @@ async function uploadImage(){
         }
 
         if(result.success === true){
-            uploadedImageURL = result.url;
             showPage("finishPage");
         } else {
             alert("Lưu ảnh thất bại: " + result.error);
@@ -790,33 +669,16 @@ async function uploadImage(){
         showPage("previewPage");
     }
 }
-//=========================
-// FINISH BUTTON
-//=========================
-document
-.getElementById("btnFinish")
-.onclick = ()=>{
-    uploadedImageURL="";
+
+document.getElementById("btnFinish").onclick = ()=>{
     capturedImage="";
     storeCodeValue="";
     pssNameValue="";
-    showPage(
-        "homePage"
-    );
+    showPage("homePage");
 };
-//=========================
-// CONTINUE REPORT
-//=========================
-document
-.getElementById("btnContinueReport")
-.onclick = ()=>{
-    let url="";
-    if(currentMode==="CHECKIN"){
-        url = CHECKIN_FORM;
-    }
-    else{
-        url = CHECKOUT_FORM;
-    }
+
+document.getElementById("btnContinueReport").onclick = ()=>{
+    let url = (currentMode === "CHECKIN") ? CHECKIN_FORM : CHECKOUT_FORM;
     window.location.href = url;
 };
 </script>
