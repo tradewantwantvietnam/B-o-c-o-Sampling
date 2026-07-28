@@ -6,7 +6,7 @@
     <title>Sampling 2026</title>
     <style>
     /* ==========================
-       RESET & MOBILE VIEWPORT FIX
+        RESET & MOBILE VIEWPORT FIX
     ========================== */
     *{
         margin:0;
@@ -24,7 +24,7 @@
         font-size: 16px;
     }
     /* ==========================
-       PAGE
+        PAGE
     ========================== */
     #app{
         width:100%;
@@ -39,12 +39,13 @@
         justify-content:center;
         padding:16px;
         background:#f6f6f6;
+        overflow-y: auto;
     }
     .page.active{
         display:flex;
     }
     /* ==========================
-       CARD (Responsive Mobile)
+        CARD (Responsive Mobile)
     ========================== */
     .card{
         width:100%;
@@ -53,6 +54,7 @@
         border-radius:20px;
         padding:24px 20px;
         box-shadow: 0 8px 24px rgba(0,0,0,.08);
+        margin: auto;
     }
     .card h1{
         text-align:center;
@@ -73,7 +75,7 @@
         margin-bottom:20px;
     }
     /* ==========================
-       INPUT & SELECT (To, dễ bấm)
+        INPUT & SELECT (To, dễ bấm)
     ========================== */
     label{
         display:block;
@@ -99,7 +101,7 @@
         border-color:#ff6b00;
     }
     /* ==========================
-       BUTTON (To, dễ chạm trên mobile)
+        BUTTON (To, dễ chạm trên mobile)
     ========================== */
     button{
         width:100%;
@@ -121,13 +123,13 @@
         opacity:.5;
     }
     /* ==========================
-       BACK BUTTON
+        BACK BUTTON
     ========================== */
     .btnBack{
         background:#9e9e9e;
     }
     /* ==========================
-       CAMERA
+        CAMERA
     ========================== */
     .camera-page{
         background:black;
@@ -147,7 +149,7 @@
         background:black;
     }
     /* ==========================
-       CAMERA TOOLBAR
+        CAMERA TOOLBAR
     ========================== */
     .cameraToolbar{
         position:fixed;
@@ -176,7 +178,7 @@
         font-size:32px;
     }
     /* ==========================
-       PREVIEW
+        PREVIEW
     ========================== */
     #previewImage{
         width:100%;
@@ -186,7 +188,7 @@
         margin-bottom:14px;
     }
     /* ==========================
-       LOADER
+        LOADER
     ========================== */
     .loader{
         width:60px;
@@ -202,7 +204,7 @@
         to{ transform:rotate(360deg); }
     }
     /* ==========================
-       MESSAGE
+        MESSAGE
     ========================== */
     .msg{
         margin-top:12px;
@@ -217,7 +219,7 @@
         color:#d32f2f;
     }
     /* ==========================
-       MOBILE SAFE AREA
+        MOBILE SAFE AREA
     ========================== */
     @supports(padding:max(0px)){
     .cameraToolbar{
@@ -225,7 +227,7 @@
     }
     }
     /* ==========================
-       IPHONE FIX
+        IPHONE FIX
     ========================== */
     video{
         transform:scaleX(1);
@@ -235,7 +237,7 @@
         overscroll-behavior:none;
     }
     /* ==========================
-       FADE ANIMATION
+        FADE ANIMATION
     ========================== */
     .page{
         animation:fade .2s;
@@ -304,6 +306,15 @@
         <div class="card">
             <h2 id="storeTitle">
             </h2>
+            <label>
+                Tên PSS (Nhân viên)
+            </label>
+            <input
+                id="pssName"
+                type="text"
+                autocomplete="off"
+                placeholder="Nhập họ và tên PSS"
+            >
             <label>
                 Mã điểm bán
             </label>
@@ -494,20 +505,32 @@ let stream = null;
 let currentCamera = "environment";
 let capturedImage = "";
 let storeCodeValue = "";
+let pssNameValue = "";
 
 //=========================
 // OPEN CAMERA BUTTON
 //=========================
 
 document.getElementById("btnOpenCamera").onclick = ()=>{
+    let pss = document
+        .getElementById("pssName")
+        .value
+        .trim();
     let code = document
         .getElementById("storeCode")
         .value
         .trim();
+        
+    if(pss === ""){
+        alert("Vui lòng nhập tên PSS");
+        return;
+    }
     if(code === ""){
         alert("Vui lòng nhập mã điểm bán");
         return;
     }
+    
+    pssNameValue = pss;
     storeCodeValue = code;
     currentCamera =
         document
@@ -533,7 +556,7 @@ async function openCamera(){
         .getUserMedia({
             video:{
                 facingMode:{
-                    exact:
+                    ideal:
                     currentCamera
                 }
             },
@@ -647,63 +670,90 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQa4AAsZU9gPnvU9z8z
 const CHECKIN_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSchaY-0UJIstKxnNRIDgE-bx7VAiDP1DLWn2TItWad7qzOP8A/viewform?usp=dialog";
 const CHECKOUT_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSe-f946yjSe9lr6iVp4kzvzGHGlHxHzg-uhOyJpzuleh-raLQ/viewform?usp=dialog";
 let uploadedImageURL = "";
+
+//=========================
+// GET DEVICE INFO
+//=========================
+function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    let browser = "Unknown";
+    let device = "Desktop";
+
+    if (ua.indexOf("Firefox") > -1) {
+        browser = "Firefox";
+    } else if (ua.indexOf("SamsungBrowser") > -1) {
+        browser = "Samsung Internet";
+    } else if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) {
+        browser = "Opera";
+    } else if (ua.indexOf("Edge") > -1) {
+        browser = "Edge";
+    } else if (ua.indexOf("Edg") > -1) {
+        browser = "Chromium Edge";
+    } else if (ua.indexOf("Chrome") > -1) {
+        browser = "Chrome";
+    } else if (ua.indexOf("Safari") > -1) {
+        browser = "Safari";
+    }
+
+    if (/android/i.test(ua)) {
+        device = "Android Phone/Tablet";
+    } else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
+        device = "iOS (iPhone/iPad)";
+    } else if (/Mobile|iP(hone|od|ad)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+        device = "Mobile Other";
+    } else {
+        device = "PC / Desktop";
+    }
+
+    return { device, browser };
+}
+
 //=========================
 // UPLOAD IMAGE TO DRIVE
 //=========================
 async function uploadImage(){
     try{
+        const info = getDeviceInfo();
+
         let payload = {
-            image:
-            capturedImage,
-            storeCode:
-            storeCodeValue,
-            type:
-            currentMode,
-            time:
-            new Date()
-            .toISOString()
+            image: capturedImage,
+            pssName: pssNameValue,
+            storeCode: storeCodeValue,
+            type: currentMode,
+            device: info.device,
+            browser: info.browser,
+            time: new Date().toISOString()
         };
-        let response =
-        await fetch(
+
+        let response = await fetch(
           SCRIPT_URL,
           {
-            method:"POST",
-            headers:{
-                "Content-Type":"text/plain;charset=utf-8"
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
             },
-            body:
-            JSON.stringify(payload)
+            body: JSON.stringify(payload)
           }
         );
-        let result =
-        await response.json();
-        console.log("HTTP:", response.status);
-        console.log("DATA:", result);
-        console.log("SERVER:", result);
+
+        let result = await response.json();
+        
         if(!response.ok){
-        throw new Error(
-            "HTTP Error: " + response.status
-        );
-}
+            throw new Error("HTTP Error: " + response.status);
+        }
+
         if(result.success === true){
-        uploadedImageURL = result.url;
-        showPage("finishPage");
-}
-else{
-    alert(
-        "Lưu ảnh thất bại: " + result.error
-    );
-    showPage("previewPage");
-}
+            uploadedImageURL = result.url;
+            showPage("finishPage");
+        } else {
+            alert("Lưu ảnh thất bại: " + result.error);
+            showPage("previewPage");
+        }
     }
     catch(error){
         console.log(error);
-        alert(
-            "Có lỗi khi upload ảnh"
-        );
-        showPage(
-            "previewPage"
-        );
+        alert("Có lỗi khi upload ảnh");
+        showPage("previewPage");
     }
 }
 //=========================
@@ -715,6 +765,7 @@ document
     uploadedImageURL="";
     capturedImage="";
     storeCodeValue="";
+    pssNameValue="";
     showPage(
         "homePage"
     );
