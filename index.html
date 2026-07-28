@@ -477,7 +477,12 @@ let capturedImage = "";
 let storeCodeValue = "";
 let pssNameValue = "";
 
-document.getElementById("btnOpenCamera").onclick = ()=>{
+// --- ĐOẠN CODE MỚI DÁN VÀO ---
+let btnOpenCam = document.getElementById("btnOpenCamera");
+
+function handleOpenCameraButton(e) {
+    if(e) e.preventDefault();
+
     let pss = document.getElementById("pssName").value.trim();
     let code = document.getElementById("storeCode").value.trim().toUpperCase();
         
@@ -492,12 +497,7 @@ document.getElementById("btnOpenCamera").onclick = ()=>{
         return;
     }
     
-    // =========================================================================
-    // ĐOẠN CODE SỬA MỚI: RÀNG BUỘC ĐÚNG ĐỊNH DẠNG MÃ ĐIỂM BÁN
-    // =========================================================================
-    // * Giải thích: Mẫu dưới đây quy định mã phải gồm 3 chữ cái đầu (VD: TNI) 
-    //   theo sau là từ 3 đến 6 chữ số (VD: 007701). Bạn có thể đổi lại mẫu này 
-    //   cho khớp hoàn toàn với thực tế mã điểm bán bên bạn.
+    // Ràng buộc đúng định dạng mã điểm bán (Ví dụ: 3 chữ cái đầu + từ 3 đến 6 chữ số)
     const storeCodeRegex = /^[A-Z]{3}[0-9]{3,6}$/;
 
     if(!storeCodeRegex.test(code)){
@@ -505,18 +505,16 @@ document.getElementById("btnOpenCamera").onclick = ()=>{
         document.getElementById("storeCode").focus();
         return;
     }
-    // =========================================================================
     
     pssNameValue = pss;
     storeCodeValue = code;
     currentCamera = document.getElementById("cameraSelect").value;
     openCamera();
-};
-    
-    pssNameValue = pss;
-    storeCodeValue = code;
-    currentCamera = document.getElementById("cameraSelect").value;
-    openCamera();
+}
+
+btnOpenCam.onclick = handleOpenCameraButton;
+btnOpenCam.ontouchend = (e) => {
+    handleOpenCameraButton(e);
 };
 
 async function openCamera(){
