@@ -258,44 +258,15 @@
             <p class="subtitle">
                 Hệ thống Check-in / Check-out Sampling
             </p>
-            <button id="btnPhoto">
-                📷 Chụp ảnh
+            <button id="btnHomeCheckIn">
+                ☀️ Check-in (Ban ngày)
             </button>
-            <button id="btnReport">
-                📝 Báo cáo
-            </button>
-        </div>
-    </section>
-    <!-- ================= PHOTO MENU ================= -->
-    <section id="photoMenu" class="page">
-        <div class="card">
-            <h2>Chọn loại chụp</h2>
-            <button id="btnCheckIn">
-                🟢 Check-in
-            </button>
-            <button id="btnCheckOut">
-                🔴 Check-out
-            </button>
-            <button class="btnBack">
-                ⬅ Quay lại
+            <button id="btnHomeCheckOut" style="background: #2c3e50;">
+                🌙 Check-out (Ban đêm)
             </button>
         </div>
     </section>
-    <!-- ================= REPORT MENU ================= -->
-    <section id="reportMenu" class="page">
-        <div class="card">
-            <h2>Chọn loại báo cáo</h2>
-            <button id="btnReportCheckIn">
-                🟢 Báo cáo Check-in
-            </button>
-            <button id="btnReportCheckOut">
-                🔴 Báo cáo Check-out
-            </button>
-            <button class="btnBack">
-                ⬅ Quay lại
-            </button>
-        </div>
-    </section>
+
     <!-- ================= STORE ================= -->
     <section id="storePage" class="page">
         <div class="card">
@@ -434,23 +405,18 @@ function showPage(id){
         .classList.add("active");
 }
 
-document.getElementById("btnPhoto").onclick = ()=>{
-    showPage("photoMenu");
-};
-document.getElementById("btnReport").onclick = ()=>{
-    showPage("reportMenu");
-};
-
-document.getElementById("btnCheckIn").onclick = ()=>{
+// Xử lý sự kiện từ màn hình chính trực tiếp nhảy thẳng vào điền thông tin Check-in / Check-out
+document.getElementById("btnHomeCheckIn").onclick = ()=>{
     currentMode = "CHECKIN";
-    document.getElementById("storeTitle").innerHTML = "🟢 Check-in";
-    document.getElementById("reportDateGroup").style.display = "none"; // Ẩn ngày làm vì check-in không cần
+    document.getElementById("storeTitle").innerHTML = "☀️ Check-in (Ban ngày)";
+    document.getElementById("reportDateGroup").style.display = "none"; 
     showPage("storePage");
 };
-document.getElementById("btnCheckOut").onclick = ()=>{
+
+document.getElementById("btnHomeCheckOut").onclick = ()=>{
     currentMode = "CHECKOUT";
-    document.getElementById("storeTitle").innerHTML = "🔴 Check-out";
-    document.getElementById("reportDateGroup").style.display = "block"; // Hiện ngày làm để nối sang sheet BCBH
+    document.getElementById("storeTitle").innerHTML = "🌙 Check-out (Ban đêm)";
+    document.getElementById("reportDateGroup").style.display = "block"; 
     
     // Mặc định gán ngày hôm nay vào ô chọn ngày
     const today = new Date().toISOString().split('T')[0];
@@ -459,22 +425,10 @@ document.getElementById("btnCheckOut").onclick = ()=>{
     showPage("storePage");
 };
 
-document.getElementById("btnReportCheckIn").onclick = ()=>{
-    location.href = CHECKIN_FORM;
-};
-document.getElementById("btnReportCheckOut").onclick = ()=>{
-    location.href = CHECKOUT_FORM;
-};
-
 document.querySelectorAll(".btnBack").forEach(btn=>{
     btn.onclick=()=>{
-        if(document.getElementById("photoMenu").classList.contains("active") ||
-           document.getElementById("reportMenu").classList.contains("active")){
-            showPage("homePage");
-            return;
-        }
         if(document.getElementById("storePage").classList.contains("active")){
-            showPage("photoMenu");
+            showPage("homePage");
             return;
         }
     };
@@ -514,7 +468,6 @@ function handleOpenCameraButton(e) {
         return;
     }
     
-    // Ràng buộc đúng định dạng mã điểm bán (Ví dụ: 3 chữ cái đầu + từ 3 đến 6 chữ số)
     const storeCodeRegex = /^[A-Z]{3}[0-9]{3,6}$/;
 
     if(!storeCodeRegex.test(code)){
