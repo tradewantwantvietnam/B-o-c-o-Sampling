@@ -520,7 +520,8 @@ document.getElementById("btnOpenCamera").onclick = ()=>{
     let code = document
         .getElementById("storeCode")
         .value
-        .trim();
+        .trim()
+        .toUpperCase(); // Ép luôn chữ hoa
         
     if(pss === ""){
         alert("Vui lòng nhập tên PSS");
@@ -530,6 +531,38 @@ document.getElementById("btnOpenCamera").onclick = ()=>{
         alert("Vui lòng nhập mã điểm bán");
         return;
     }
+
+    // ==========================================
+    // RÀNG BUỘC ĐIỀU KIỆN MÃ ĐIỂM BÁN TẠI ĐÂY
+    // ==========================================
+    // Ví dụ 1: Kiểm tra độ dài phải từ 5 ký tự trở lên (sửa số tùy ý bạn)
+    if(code.length < 5){
+        alert("Mã điểm bán không hợp lệ! Mã phải có ít nhất 5 ký tự.");
+        document.getElementById("storeCode").focus();
+        return;
+    }
+
+    /* 
+      Ví dụ 2 (Nâng cao): Nếu mã của bạn phải theo mẫu chữ cái đầu rồi đến số 
+      (Ví dụ: TNI001, ABC1234,...), bạn có thể dùng Regex kiểm tra mẫu:
+      
+      const storeCodeRegex = /^[A-Z0-9]{5,15}$/; // Chỉ gồm chữ và số, dài từ 5-15 ký tự
+      if(!storeCodeRegex.test(code)){
+          alert("Mã điểm bán sai định dạng! Vui lòng kiểm tra lại.");
+          document.getElementById("storeCode").focus();
+          return;
+      }
+    */
+    // ==========================================
+
+    pssNameValue = pss;
+    storeCodeValue = code;
+    currentCamera =
+        document
+        .getElementById("cameraSelect")
+        .value;
+    openCamera();
+};
     
     pssNameValue = pss;
     storeCodeValue = code;
