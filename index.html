@@ -320,6 +320,16 @@
                 style="text-transform: uppercase;"
                 placeholder="Ví dụ: TNI007701"
             >
+            
+            <!-- Trường chọn ngày làm (Chỉ hiện khi Check-out để đối chiếu sheet BCBH) -->
+            <div id="reportDateGroup" style="display:none;">
+                <label>Ngày làm / Ngày báo cáo</label>
+                <input
+                    id="reportDate"
+                    type="date"
+                >
+            </div>
+
             <label>
                 Chọn Camera
             </label>
@@ -433,12 +443,19 @@ document.getElementById("btnReport").onclick = ()=>{
 
 document.getElementById("btnCheckIn").onclick = ()=>{
     currentMode = "CHECKIN";
-    document.getElementById("storeTitle").innerHTML = "📷 Check-in";
+    document.getElementById("storeTitle").innerHTML = "🟢 Check-in";
+    document.getElementById("reportDateGroup").style.display = "none"; // Ẩn ngày làm vì check-in không cần
     showPage("storePage");
 };
 document.getElementById("btnCheckOut").onclick = ()=>{
     currentMode = "CHECKOUT";
-    document.getElementById("storeTitle").innerHTML = "📷 Check-out";
+    document.getElementById("storeTitle").innerHTML = "🔴 Check-out";
+    document.getElementById("reportDateGroup").style.display = "block"; // Hiện ngày làm để nối sang sheet BCBH
+    
+    // Mặc định gán ngày hôm nay vào ô chọn ngày
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("reportDate").value = today;
+
     showPage("storePage");
 };
 
@@ -476,8 +493,8 @@ let currentCamera = "environment";
 let capturedImage = "";
 let storeCodeValue = "";
 let pssNameValue = "";
+let reportDateValue = "";
 
-// --- ĐOẠN CODE MỚI DÁN VÀO ---
 let btnOpenCam = document.getElementById("btnOpenCamera");
 
 function handleOpenCameraButton(e) {
@@ -504,6 +521,18 @@ function handleOpenCameraButton(e) {
         alert("Mã điểm bán không đúng định dạng chuẩn!\n(Ví dụ mẫu đúng: TNI007701)");
         document.getElementById("storeCode").focus();
         return;
+    }
+
+    if(currentMode === "CHECKOUT") {
+        let rDate = document.getElementById("reportDate").value;
+        if(!rDate) {
+            alert("Vui lòng chọn ngày làm / ngày báo cáo");
+            document.getElementById("reportDate").focus();
+            return;
+        }
+        reportDateValue = rDate;
+    } else {
+        reportDateValue = "";
     }
     
     pssNameValue = pss;
@@ -545,14 +574,12 @@ document.getElementById("btnSwitchCamera").onclick = ()=>{
     openCamera();
 };
 
-// FIX FOR XIAOMI (MIUI / Mi Browser / Chrome): Use both click and touchend handlers for capture button
 function handleCapture(e) {
     if(e) e.preventDefault();
     
     let video = document.getElementById("video");
     let canvas = document.getElementById("canvas");
     
-    // Fallback dimensions if videoWidth is 0 on Xiaomi
     let width = video.videoWidth || video.clientWidth || window.innerWidth;
     let height = video.videoHeight || video.clientHeight || window.innerHeight;
     
@@ -648,6 +675,7 @@ async function uploadImage(){
             image: capturedImage,
             pssName: pssNameValue,
             storeCode: storeCodeValue,
+            reportDate: reportDateValue,
             type: currentMode,
             device: info.device,
             browser: info.browser,
@@ -686,6 +714,7 @@ document.getElementById("btnFinish").onclick = ()=>{
     capturedImage="";
     storeCodeValue="";
     pssNameValue="";
+    reportDateValue="";
     showPage("homePage");
 };
 
