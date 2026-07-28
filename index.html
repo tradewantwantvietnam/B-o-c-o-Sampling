@@ -492,12 +492,26 @@ document.getElementById("btnOpenCamera").onclick = ()=>{
         return;
     }
     
-    // Ràng buộc kiểm tra mã điểm bán tối thiểu 5 ký tự
-    if(code.length < 5){
-        alert("Mã điểm bán không hợp lệ! Mã phải có ít nhất 5 ký tự.");
+    // =========================================================================
+    // ĐOẠN CODE SỬA MỚI: RÀNG BUỘC ĐÚNG ĐỊNH DẠNG MÃ ĐIỂM BÁN
+    // =========================================================================
+    // * Giải thích: Mẫu dưới đây quy định mã phải gồm 3 chữ cái đầu (VD: TNI) 
+    //   theo sau là từ 3 đến 6 chữ số (VD: 007701). Bạn có thể đổi lại mẫu này 
+    //   cho khớp hoàn toàn với thực tế mã điểm bán bên bạn.
+    const storeCodeRegex = /^[A-Z]{3}[0-9]{3,6}$/;
+
+    if(!storeCodeRegex.test(code)){
+        alert("Mã điểm bán không đúng định dạng chuẩn!\n(Ví dụ mẫu đúng: TNI007701)");
         document.getElementById("storeCode").focus();
         return;
     }
+    // =========================================================================
+    
+    pssNameValue = pss;
+    storeCodeValue = code;
+    currentCamera = document.getElementById("cameraSelect").value;
+    openCamera();
+};
     
     pssNameValue = pss;
     storeCodeValue = code;
