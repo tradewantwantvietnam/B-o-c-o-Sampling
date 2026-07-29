@@ -45,7 +45,7 @@
         display:flex;
     }
 
-    /* THEME BACKGROUNDS (Chỉ áp dụng nền tối nhẹ cho Check-out, Check-in giữ nền mặc định) */
+    /* THEME BACKGROUNDS */
     .page-checkout {
         background: #2a2f35;
     }
@@ -264,7 +264,6 @@
             <p class="subtitle">
                 Hệ thống Check-in / Check-out Sampling
             </p>
-            <!-- Nút Check-in màu xanh dương pastel nhẹ nhàng, chữ tối màu hoặc sáng dịu -->
             <button id="btnHomeCheckIn" style="background: #e1ecfd; color: #1d4ed8;">
                 ☀️ Check-in
             </button>
@@ -280,15 +279,6 @@
             <h2 id="storeTitle">
             </h2>
             <label>
-                Tên PSS (Nhân viên)
-            </label>
-            <input
-                id="pssName"
-                type="text"
-                autocomplete="off"
-                placeholder="Nhập họ và tên PSS"
-            >
-            <label>
                 Mã điểm bán
             </label>
             <input
@@ -299,9 +289,9 @@
                 placeholder="Ví dụ: TNI007701"
             >
             
-            <!-- Trường chọn ngày làm (Chỉ hiện khi Check-out để đối chiếu sheet BCBH) -->
-            <div id="reportDateGroup" style="display:none;">
-                <label>Ngày làm / Ngày báo cáo</label>
+            <!-- Trường chọn ngày làm / Lịch làm -->
+            <div id="reportDateGroup">
+                <label>Chọn lịch làm / Ngày báo cáo</label>
                 <input
                     id="reportDate"
                     type="date"
@@ -414,14 +404,12 @@ function showPage(id, mode = ""){
     targetPage.classList.add("active");
 
     let activeMode = mode || currentMode;
-    // Check-in không đổi màu nền (giữ nguyên mặc định như không có), chỉ Check-out mới chuyển sang nền tối nhẹ
     if(id === "storePage" || id === "previewPage" || id === "finishPage"){
         if(activeMode === "CHECKOUT"){
             targetPage.classList.add("page-checkout");
         }
     }
 
-    // Đổi màu các nút hành động (Check-in dùng xanh dương pastel/dịu mắt, Check-out dùng tối nhẹ)
     let actionButtons = targetPage.querySelectorAll(".btnActionTheme");
     actionButtons.forEach(btn => {
         if(activeMode === "CHECKIN"){
@@ -438,7 +426,10 @@ function showPage(id, mode = ""){
 document.getElementById("btnHomeCheckIn").onclick = ()=>{
     currentMode = "CHECKIN";
     document.getElementById("storeTitle").innerHTML = "☀️ Check-in";
-    document.getElementById("reportDateGroup").style.display = "none"; 
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("reportDate").value = today;
+
     showPage("storePage", "CHECKIN");
 };
 
@@ -446,7 +437,6 @@ document.getElementById("btnHomeCheckIn").onclick = ()=>{
 document.getElementById("btnHomeCheckOut").onclick = ()=>{
     currentMode = "CHECKOUT";
     document.getElementById("storeTitle").innerHTML = "🌙 Check-out";
-    document.getElementById("reportDateGroup").style.display = "block"; 
     
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("reportDate").value = today;
@@ -475,7 +465,6 @@ let stream = null;
 let currentCamera = "environment";
 let capturedImage = "";
 let storeCodeValue = "";
-let pssNameValue = "";
 let reportDateValue = "";
 
 let btnOpenCam = document.getElementById("btnOpenCamera");
@@ -483,14 +472,9 @@ let btnOpenCam = document.getElementById("btnOpenCamera");
 function handleOpenCameraButton(e) {
     if(e) e.preventDefault();
 
-    let pss = document.getElementById("pssName").value.trim();
     let code = document.getElementById("storeCode").value.trim().toUpperCase();
+    let rDate = document.getElementById("reportDate").value;
         
-    if(pss === ""){
-        alert("Vui lòng nhập tên PSS");
-        document.getElementById("pssName").focus();
-        return;
-    }
     if(code === ""){
         alert("Vui lòng nhập mã điểm bán");
         document.getElementById("storeCode").focus();
@@ -505,20 +489,14 @@ function handleOpenCameraButton(e) {
         return;
     }
 
-    if(currentMode === "CHECKOUT") {
-        let rDate = document.getElementById("reportDate").value;
-        if(!rDate) {
-            alert("Vui lòng chọn ngày làm / ngày báo cáo");
-            document.getElementById("reportDate").focus();
-            return;
-        }
-        reportDateValue = rDate;
-    } else {
-        reportDateValue = "";
+    if(!rDate) {
+        alert("Vui lòng chọn lịch làm / ngày báo cáo");
+        document.getElementById("reportDate").focus();
+        return;
     }
     
-    pssNameValue = pss;
     storeCodeValue = code;
+    reportDateValue = rDate;
     currentCamera = document.getElementById("cameraSelect").value;
     openCamera();
 }
@@ -655,7 +633,6 @@ async function uploadImage(){
 
         let payload = {
             image: capturedImage,
-            pssName: pssNameValue,
             storeCode: storeCodeValue,
             reportDate: reportDateValue,
             type: currentMode,
@@ -695,7 +672,6 @@ async function uploadImage(){
 document.getElementById("btnFinish").onclick = ()=>{
     capturedImage="";
     storeCodeValue="";
-    pssNameValue="";
     reportDateValue="";
     showPage("homePage");
 };
