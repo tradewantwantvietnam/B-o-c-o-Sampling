@@ -519,66 +519,96 @@ let btnOpenCam = document.getElementById("btnOpenCamera");
 
 function handleOpenCameraButton(e) {
 
-    if(e) e.preventDefault();
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    console.log("========== OPEN CAMERA ==========");
+    console.log("currentMode:", currentMode);
 
     // ==========================================
     // CHECK-IN
     // ==========================================
 
-    if(currentMode === "CHECKIN") {
+    if (currentMode === "CHECKIN") {
 
-        // Không cần mã điểm bán
-        // Không cần ngày báo cáo
+        console.log("MODE = CHECKIN");
 
         currentCamera =
             document.getElementById("cameraSelect").value;
 
+        console.log("Camera:", currentCamera);
+
         openCamera();
+
         return;
     }
+
+
     // ==========================================
     // CHECK-OUT
-    // GIỮ NGUYÊN KIỂM TRA CŨ
     // ==========================================
-    let code =
+
+    console.log("MODE = CHECKOUT");
+
+    const code =
         document
             .getElementById("storeCode")
             .value
             .trim()
             .toUpperCase();
 
-    let rDate =
+    const rDate =
         document
             .getElementById("reportDate")
             .value;
-    if(code === "") {
+
+
+    if (code === "") {
+
         alert("Vui lòng nhập mã điểm bán");
+
         document
             .getElementById("storeCode")
             .focus();
+
         return;
     }
+
+
     const storeCodeRegex =
         /^[A-Z]{3}[0-9]{3,6}$/;
-    if(!storeCodeRegex.test(code)) {
+
+
+    if (!storeCodeRegex.test(code)) {
+
         alert(
             "Mã điểm bán không đúng định dạng chuẩn!\n" +
             "(Ví dụ mẫu đúng: TNI007701)"
         );
+
         document
             .getElementById("storeCode")
             .focus();
+
         return;
     }
-    if(!rDate) {
+
+
+    if (!rDate) {
+
         alert(
             "Vui lòng chọn lịch làm / ngày báo cáo"
         );
+
         document
             .getElementById("reportDate")
             .focus();
+
         return;
     }
+
     storeCodeValue = code;
 
     reportDateValue = rDate;
@@ -588,62 +618,224 @@ function handleOpenCameraButton(e) {
             .getElementById("cameraSelect")
             .value;
 
+
+    console.log("Store:", storeCodeValue);
+    console.log("Date:", reportDateValue);
+    console.log("Camera:", currentCamera);
+
+
     openCamera();
 }
 
-async function openCamera(){
-    try{
+async function openCamera() {
 
-        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-            alert(
-                "Trình duyệt này không hỗ trợ camera.\n" +
-                "Hãy mở bằng Chrome hoặc Safari."
-            );
-            return;
-        }
+    console.log("================================");
+    console.log("START OPEN CAMERA");
+    console.log("currentMode =", currentMode);
+    console.log("currentCamera =", currentCamera);
 
-        // Dừng camera cũ nếu đang chạy
-        if(stream){
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-        }
 
-        // Xin quyền camera
-        stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false
-        });
+    // ==========================================
+    // KIỂM TRA TRÌNH DUYỆT
+    // ==========================================
 
-        const videoElement =
-            document.getElementById("video");
-
-        videoElement.srcObject = stream;
-
-        // Hiển thị màn hình camera
-        showPage("cameraPage", currentMode);
-
-        await videoElement.play();
-
-    }
-    catch(error){
-
-        console.error("CAMERA ERROR:", error);
-
-        if(stream){
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-        }
-
-        showPage("storePage", currentMode);
+    if (!window.isSecureContext) {
 
         alert(
-            "Không mở được camera.\n\n" +
-            "Lỗi: " + error.name + "\n\n" +
-            "Hãy kiểm tra quyền Camera của trình duyệt."
+            "Trang web chưa chạy ở chế độ HTTPS.\n\n" +
+            "Camera chỉ hoạt động trên HTTPS."
+        );
+
+        console.error("NOT SECURE CONTEXT");
+
+        return;
+    }
+
+
+    // ==========================================
+    // KIỂM TRA CAMERA API
+    // ==========================================
+
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+
+        alert(
+            "Trình duyệt không hỗ trợ camera.\n\n" +
+            "Hãy mở bằng Chrome hoặc Safari."
+        );
+
+        console.error(
+            "getUserMedia KHÔNG tồn tại."
+        );
+
+        return;
+    }
+
+
+    // ==========================================
+    // DỪNG CAMERA CŨ
+    // ==========================================
+
+    if (stream) {
+
+        console.log("Stopping old camera...");
+
+        stream
+            .getTracks()
+            .forEach(track => track.stop());
+
+        stream = null;
+    }
+
+
+    try {
+
+        console.log("Request camera permission...");
+
+
+        // ======================================
+        // XIN QUYỀN CAMERA
+        // ======================================
+
+        const constraints = {
+
+            video: {
+                facingMode: {
+                    ideal: currentCamera
+                }
+            },
+            audio: false
+        };
+        console.log(
+            "Camera constraints:",
+            constraints
+        );
+        stream =
+            await navigator.mediaDevices
+                .getUserMedia(constraints);
+        console.log(
+            "CAMERA STREAM OK"
+        );
+        // ======================================
+        // GÁN CAMERA VÀO VIDEO
+        // ======================================
+        const videoElement =
+            document.getElementById("video");
+        videoElement.srcObject = stream;
+        // ======================================
+        // CHUYỂN SANG MÀN HÌNH CAMERA
+        // ======================================
+        showPage(
+            "cameraPage",
+            currentMode
+        );
+        // ======================================
+        // ĐỢI VIDEO SẴN SÀNG
+        // ======================================
+        await new Promise(resolve => {
+            if (
+                videoElement.readyState >= 2
+            ) {
+                resolve();
+                return;
+            }
+            videoElement.onloadedmetadata =
+                () => {
+                    resolve();
+                };
+        });
+        // ======================================
+        // PLAY CAMERA
+        // ======================================
+        await videoElement.play();
+        console.log(
+            "CAMERA PLAYING SUCCESSFULLY"
+        );
+        console.log(
+            "================================"
         );
     }
+    catch (error) {
+        console.error(
+            "================================"
+        );
+        console.error(
+            "CAMERA ERROR:"
+        );
+        console.error(error);
+        console.error(
+            "name:",
+            error.name
+        );
+        console.error(
+            "message:",
+            error.message
+        );
+        console.error(
+            "================================"
+        );
+        // ======================================
+        // DỪNG STREAM NẾU CÓ
+        // ======================================
+        if (stream) {
+            stream
+                .getTracks()
+                .forEach(track => track.stop());
+            stream = null;
+        }
+        // ======================================
+        // QUAY VỀ STORE
+        // ======================================
+        showPage(
+            "storePage",
+            currentMode
+        );
+        // ======================================
+        // HIỂN THỊ LỖI CHÍNH XÁC
+        // ======================================
+        let message =
+            "Không mở được camera.\n\n";
+        if (error.name === "NotAllowedError") {
+            message +=
+                "❌ Trình duyệt đang CHẶN quyền Camera.\n\n" +
+                "Hãy cho phép Camera rồi thử lại.";
+        }
+        else if (
+            error.name === "NotFoundError"
+        ) {
+            message +=
+                "❌ Không tìm thấy camera trên thiết bị.";
+        }
+        else if (
+            error.name === "NotReadableError"
+        ) {
+            message +=
+                "❌ Camera đang được ứng dụng khác sử dụng.";
+        }
+        else if (
+            error.name === "SecurityError"
+        ) {
+            message +=
+                "❌ Trình duyệt chặn truy cập Camera do vấn đề bảo mật.";
+        }
+        else if (
+            error.name === "AbortError"
+        ) {
+            message +=
+                "❌ Camera bị dừng trước khi khởi động xong.";
+        }
+        else {
+            message +=
+                "❌ Lỗi: " +
+                error.name +
+                "\n\n" +
+                error.message;
+        }
+        alert(message);
+    }
 }
-
 document.getElementById("btnSwitchCamera").onclick = ()=>{
     currentCamera = (currentCamera === "environment") ? "user" : "environment";
     openCamera();
