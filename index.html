@@ -656,7 +656,7 @@ function getDeviceInfo() {
     const ua = navigator.userAgent;
     let browser = "Unknown";
     let device = "Desktop";
-
+    
     if (ua.indexOf("Firefox") > -1) {
         browser = "Firefox";
     } else if (ua.indexOf("SamsungBrowser") > -1) {
@@ -672,7 +672,6 @@ function getDeviceInfo() {
     } else if (ua.indexOf("Safari") > -1) {
         browser = "Safari";
     }
-
     if (/android/i.test(ua)) {
         device = "Android Phone/Tablet";
     } else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
@@ -684,7 +683,6 @@ function getDeviceInfo() {
     }
     return { device, browser };
 }
-
 async function uploadImage(){
     try{
         const info = getDeviceInfo();
@@ -705,20 +703,56 @@ async function uploadImage(){
             },
             body: JSON.stringify(payload)
         });
-        let result = await response.json();    
+        let result = await response.json();
         if(!response.ok){
             throw new Error("HTTP Error: " + response.status);
         }
         if(result.success === true){
+            // ==========================================
+            // CHECK-IN
+            // SAU KHI LƯU ẢNH -> TỰ ĐỘNG MỞ BÁO CÁO
+            // ==========================================
+            if(currentMode === "CHECKIN"){
+
+                if(!sessionId){
+                    alert(
+                        "Không tìm thấy Session ID. " +
+                        "Vui lòng thực hiện lại Check-in."
+                    );
+                    showPage("previewPage", currentMode);
+                    return;
+                }
+                const url =
+                    CHECKIN_FORM +
+                    "&entry.1183006421=" +
+                    encodeURIComponent(sessionId);
+                console.log(
+                    "CHECK-IN hoàn tất. Chuyển sang Form báo cáo:",
+                    url
+                );
+                // Chuyển thẳng sang Google Form Check-in
+                window.location.href = url;
+                return;
+            }
+            // ==========================================
+            // CHECK-OUT
+            // VẪN GIỮ MÀN HÌNH KẾT THÚC NHƯ CŨ
+            // ==========================================
             showPage("finishPage", currentMode);
         } else {
-            alert("Lưu ảnh thất bại: " + result.error);
+            alert(
+                "Lưu ảnh thất bại: " +
+                (result.error || "Không rõ nguyên nhân")
+            );
             showPage("previewPage", currentMode);
         }
     }
     catch(error){
-        console.log(error);
-        alert("Có lỗi khi upload ảnh");
+        console.log("UPLOAD ERROR:", error);
+        alert(
+            "Có lỗi khi upload ảnh.\n\n" +
+            error.message
+        );
         showPage("previewPage", currentMode);
     }
 }
