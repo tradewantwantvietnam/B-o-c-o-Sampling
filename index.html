@@ -724,7 +724,7 @@ async function uploadImage(){
                 }
                 const url =
                     CHECKIN_FORM +
-                    "&entry.1708771=" +
+                    "&entry.17087712=" +
                     encodeURIComponent(sessionId);
                 console.log(
                     "CHECK-IN hoàn tất. Chuyển sang Form báo cáo:",
@@ -770,7 +770,7 @@ document.getElementById("btnContinueReport").onclick = ()=>{
             alert("Không tìm thấy Session ID. Vui lòng thực hiện lại Check-in.");
             return;
         }
-        const url = CHECKIN_FORM + "&entry.1708771=" + encodeURIComponent(sessionId);
+        const url = CHECKIN_FORM + "&entry.17087712=" + encodeURIComponent(sessionId);
         window.location.href = url;
         return;
     }
