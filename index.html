@@ -593,24 +593,54 @@ function handleOpenCameraButton(e) {
 
 async function openCamera(){
     try{
-        if(stream){
-            stream.getTracks().forEach(track=>track.stop());
-        }
-        stream = await navigator.mediaDevices.getUserMedia({
-            video:{
-                facingMode:{ ideal: currentCamera }
-            },
-            audio:false
-        });
-        let videoElement = document.getElementById("video");
-        videoElement.srcObject = stream;
-        await videoElement.play().catch(e => console.log("Video play error:", e));
 
-        showPage("cameraPage");
+        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+            alert(
+                "Trình duyệt này không hỗ trợ camera.\n" +
+                "Hãy mở bằng Chrome hoặc Safari."
+            );
+            return;
+        }
+
+        // Dừng camera cũ nếu đang chạy
+        if(stream){
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+
+        // Xin quyền camera
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        });
+
+        const videoElement =
+            document.getElementById("video");
+
+        videoElement.srcObject = stream;
+
+        // Hiển thị màn hình camera
+        showPage("cameraPage", currentMode);
+
+        await videoElement.play();
+
     }
     catch(error){
-        console.log(error);
-        alert("Không mở được camera. Vui lòng kiểm tra lại quyền truy cập camera trên thiết bị của bạn.");
+
+        console.error("CAMERA ERROR:", error);
+
+        if(stream){
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+
+        showPage("storePage", currentMode);
+
+        alert(
+            "Không mở được camera.\n\n" +
+            "Lỗi: " + error.name + "\n\n" +
+            "Hãy kiểm tra quyền Camera của trình duyệt."
+        );
     }
 }
 
