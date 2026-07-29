@@ -280,14 +280,16 @@
             </h2>
             <label>
                 Mã điểm bán
-            </label>
-            <input
-                id="storeCode"
-                type="text"
-                autocomplete="off"
-                style="text-transform: uppercase;"
-                placeholder="Ví dụ: TNI007701"
-            >
+            <div id="storeCodeGroup">
+    <label>Mã điểm bán</label>
+    <input
+        id="storeCode"
+        type="text"
+        autocomplete="off"
+        style="text-transform: uppercase;"
+        placeholder="Ví dụ: TNI007701"
+    >
+</div>
             
             <!-- Trường chọn ngày làm / Lịch làm -->
             <div id="reportDateGroup">
@@ -442,7 +444,7 @@ document.getElementById("btnHomeCheckIn").onclick = ()=>{
     storeCodeValue = "";
     reportDateValue = "";
 
-    document.getElementById("storeCode").parentElement.style.display = "none";
+    document.getElementById("storeCodeGroup").style.display = "none"; 
     document.getElementById("reportDateGroup").style.display = "none";
     document.getElementById("storeTitle").innerHTML = "☀️ Check-in";
 
@@ -453,7 +455,7 @@ document.getElementById("btnHomeCheckIn").onclick = ()=>{
 document.getElementById("btnHomeCheckOut").onclick = ()=>{
     currentMode = "CHECKOUT";
 
-    document.getElementById("storeCode").parentElement.style.display = "block";
+    document.getElementById("storeCodeGroup").style.display = "block";
     document.getElementById("reportDateGroup").style.display = "block";
     document.getElementById("storeTitle").innerHTML = "🌙 Check-out";
 
