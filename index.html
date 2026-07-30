@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -15,8 +16,7 @@
     -webkit-tap-highlight-color:transparent;
 }
 
-html,
-body{
+html,body{
     width:100%;
     height:100%;
     background:#f6f6f6;
@@ -283,13 +283,12 @@ to{
 }
 
 </style>
+
 </head>
 
 <body>
 
 <div id="app">
-
-<!-- ================= HOME ================= -->
 
 <section id="homePage" class="page active">
 
@@ -301,24 +300,17 @@ to{
 Hệ thống Check-in / Check-out Sampling
 </p>
 
-<button
-id="btnHomeCheckIn"
-class="btnCheckin">
+<button id="btnHomeCheckIn" class="btnCheckin">
 ☀️ Check-in
 </button>
 
-<button
-id="btnHomeCheckOut"
-class="btnCheckout">
+<button id="btnHomeCheckOut" class="btnCheckout">
 🌙 Check-out
 </button>
 
 </div>
 
 </section>
-
-
-<!-- ================= CHECKOUT CHOICE ================= -->
 
 <section id="checkoutChoicePage" class="page">
 
@@ -330,30 +322,21 @@ class="btnCheckout">
 Chọn hình thức thực hiện
 </p>
 
-<button
-id="btnCheckoutPhoto"
-class="btnActionTheme">
+<button id="btnCheckoutPhoto" class="btnActionTheme">
 📷 Chụp ảnh Check-out
 </button>
 
-<button
-id="btnCheckoutReport"
-class="btnActionTheme">
+<button id="btnCheckoutReport" class="btnActionTheme">
 📝 Làm báo cáo Check-out
 </button>
 
-<button
-id="btnCheckoutBack"
-class="btnBack">
+<button id="btnCheckoutBack" class="btnBack">
 ⬅ Quay lại
 </button>
 
 </div>
 
 </section>
-
-
-<!-- ================= CAMERA SETTING ================= -->
 
 <section id="cameraSettingPage" class="page">
 
@@ -377,30 +360,17 @@ Chọn Camera
 
 </select>
 
-<button
-id="btnOpenCamera"
-class="btnActionTheme"
-type="button">
-
+<button id="btnOpenCamera" class="btnActionTheme" type="button">
 Tiếp tục
-
 </button>
 
-<button
-id="btnCameraSettingBack"
-class="btnBack"
-type="button">
-
+<button id="btnCameraSettingBack" class="btnBack" type="button">
 ⬅ Quay lại
-
 </button>
 
 </div>
 
 </section>
-
-
-<!-- ================= CAMERA ================= -->
 
 <section id="cameraPage" class="page camera-page">
 
@@ -408,50 +378,29 @@ type="button">
 📷 Đang ở chế độ CHỤP ẢNH (Bấm nút tròn để chụp)
 </div>
 
-<video
-id="video"
-autoplay
-playsinline
-muted>
-</video>
+<video id="video" autoplay playsinline muted></video>
 
-<canvas
-id="canvas"
-style="display:none">
-</canvas>
+<canvas id="canvas" style="display:none"></canvas>
 
-<img
-id="preview">
+<img id="preview">
 
 <div class="cameraToolbar">
 
-<button
-id="btnSwitchCamera"
-title="Đổi camera"
-type="button">
+<button id="btnSwitchCamera" title="Đổi camera" type="button">
 🔄
 </button>
 
-<button
-id="btnCapture"
-title="Chụp ảnh"
-type="button">
+<button id="btnCapture" title="Chụp ảnh" type="button">
 📸
 </button>
 
-<button
-id="btnCancelCamera"
-title="Hủy"
-type="button">
+<button id="btnCancelCamera" title="Hủy" type="button">
 ❌
 </button>
 
 </div>
 
 </section>
-
-
-<!-- ================= PREVIEW ================= -->
 
 <section id="previewPage" class="page">
 
@@ -461,28 +410,19 @@ type="button">
 Xem lại ảnh
 </h2>
 
-<img
-id="previewImage">
+<img id="previewImage">
 
-<button
-id="btnRetake"
-type="button">
+<button id="btnRetake" type="button">
 🔄 Chụp lại
 </button>
 
-<button
-id="btnUpload"
-class="btnActionTheme"
-type="button">
+<button id="btnUpload" class="btnActionTheme" type="button">
 ⬆ Lưu ảnh
 </button>
 
 </div>
 
 </section>
-
-
-<!-- ================= FINISH ================= -->
 
 <section id="finishPage" class="page">
 
@@ -492,53 +432,33 @@ type="button">
 ✅ Ảnh đã lưu
 </h2>
 
-<p
-id="finishDescription"
-class="subtitle">
-</p>
+<p id="finishDescription" class="subtitle"></p>
 
-<div
-id="sessionBox"
-class="sessionBox">
+<div id="sessionBox" class="sessionBox">
 
 <div class="sessionLabel">
 Session ID
 </div>
 
-<div
-id="sessionValue"
-class="sessionValue">
-</div>
+<div id="sessionValue" class="sessionValue"></div>
 
 </div>
 
-<button
-id="btnCopySession"
-class="btnCopy"
-type="button">
+<button id="btnCopySession" class="btnCopy" type="button">
 📋 Copy Session ID
 </button>
 
-<button
-id="btnContinueReport"
-class="btnActionTheme"
-type="button">
+<button id="btnContinueReport" class="btnActionTheme" type="button">
 📝 Lưu hình và tiếp tục báo cáo
 </button>
 
-<button
-id="btnFinish"
-class="btnBack"
-type="button">
+<button id="btnFinish" class="btnBack" type="button">
 ✔ Kết thúc
 </button>
 
 </div>
 
 </section>
-
-
-<!-- ================= LOADING ================= -->
 
 <section id="loadingPage" class="page">
 
@@ -560,7 +480,6 @@ Vui lòng không đóng trình duyệt
 
 </div>
 
-
 <script>
 
 let currentMode = "";
@@ -570,31 +489,42 @@ let capturedImage = "";
 let sessionId = "";
 
 
-// ==========================================
-// URL
-// ==========================================
+// =====================================================
+// APPS SCRIPT
+// =====================================================
 
 const SCRIPT_URL =
 "https://script.google.com/macros/s/AKfycbzQa4AAsZU9gPnvU9z8z0F9dl6cP38ALx_yhwPqLUdMu9SQatQyiHDoQuYh0d823uhJ/exec";
 
 
-// CHECK-IN FORM
-// Session ID = entry.1183006421
+// =====================================================
+// GOOGLE FORM
+// QUAN TRỌNG:
+// DÙNG /viewform?usp=pp_url
+// KHÔNG DÙNG /formResponse
+// =====================================================
 
 const CHECKIN_FORM =
-"https://docs.google.com/forms/d/e/1FAIpQLSchaY-0UJIstKxnNRIDgE-bx7VAiDP1DLWn2TItWad7qzOP8A/formResponse?usp=pp_url";
-
-
-// CHECK-OUT FORM
-// Session ID = entry.432817307
+"https://docs.google.com/forms/d/e/1FAIpQLSchaY-0UJIstKxnNRIDgE-bx7VAiDP1DLWn2TItWad7qzOP8A/viewform?usp=pp_url";
 
 const CHECKOUT_FORM =
-"https://docs.google.com/forms/d/e/1FAIpQLSe-f946yjSe9lr6iVp4kzvzGHGlHxHzg-uhOyJpzuleh-raLQ/viewform?usp=dialog";
+"https://docs.google.com/forms/d/e/1FAIpQLSe-f946yjSe9lr6iVp4kzvzGHGlHxHzg-uhOyJpzuleh-raLQ/viewform?usp=pp_url";
 
 
-// ==========================================
+// =====================================================
+// ENTRY ID GOOGLE FORM
+// =====================================================
+
+const CHECKIN_SESSION_ENTRY =
+"entry.17087712";
+
+const CHECKOUT_SESSION_ENTRY =
+"entry.432817307";
+
+
+// =====================================================
 // TẠO SESSION ID
-// ==========================================
+// =====================================================
 
 function createSessionId(){
 
@@ -615,25 +545,82 @@ function createSessionId(){
 }
 
 
-// ==========================================
+// =====================================================
+// TẠO LINK FORM TỰ ĐIỀN SESSION ID
+// =====================================================
+
+function buildReportUrl(){
+
+    if(!sessionId){
+
+        throw new Error(
+            "Không có Session ID để điền vào báo cáo."
+        );
+
+    }
+
+    let baseUrl = "";
+    let entryId = "";
+
+    if(currentMode === "CHECKIN"){
+
+        baseUrl =
+            CHECKIN_FORM;
+
+        entryId =
+            CHECKIN_SESSION_ENTRY;
+
+    }
+    else if(currentMode === "CHECKOUT"){
+
+        baseUrl =
+            CHECKOUT_FORM;
+
+        entryId =
+            CHECKOUT_SESSION_ENTRY;
+
+    }
+    else{
+
+        throw new Error(
+            "Không xác định được loại báo cáo."
+        );
+
+    }
+
+    const separator =
+        baseUrl.includes("?")
+        ? "&"
+        : "?";
+
+    return (
+        baseUrl +
+        separator +
+        entryId +
+        "=" +
+        encodeURIComponent(sessionId)
+    );
+
+}
+
+
+// =====================================================
 // SHOW PAGE
-// ==========================================
+// =====================================================
 
 function showPage(id, mode=""){
 
     document
         .querySelectorAll(".page")
         .forEach(p=>{
+
             p.classList.remove("active");
             p.classList.remove("page-checkout");
+
         });
 
     const target =
         document.getElementById(id);
-
-    if(!target){
-        return;
-    }
 
     target.classList.add("active");
 
@@ -648,27 +635,39 @@ function showPage(id, mode=""){
     ){
 
         if(activeMode === "CHECKOUT"){
-            target.classList.add("page-checkout");
+
+            target.classList.add(
+                "page-checkout"
+            );
+
         }
 
     }
 
     const buttons =
-        target.querySelectorAll(".btnActionTheme");
+        target.querySelectorAll(
+            ".btnActionTheme"
+        );
 
     buttons.forEach(btn=>{
 
         if(activeMode === "CHECKIN"){
 
-            btn.style.background="#3b82f6";
-            btn.style.color="#fff";
+            btn.style.background =
+                "#3b82f6";
+
+            btn.style.color =
+                "#fff";
 
         }
 
         if(activeMode === "CHECKOUT"){
 
-            btn.style.background="#414952";
-            btn.style.color="#fff";
+            btn.style.background =
+                "#414952";
+
+            btn.style.color =
+                "#fff";
 
         }
 
@@ -677,21 +676,24 @@ function showPage(id, mode=""){
 }
 
 
-// ==========================================
+// =====================================================
 // CHECK-IN
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnHomeCheckIn")
 .onclick = ()=>{
 
-    currentMode = "CHECKIN";
+    currentMode =
+        "CHECKIN";
 
     sessionId =
         createSessionId();
 
     document
-        .getElementById("cameraSettingTitle")
+        .getElementById(
+            "cameraSettingTitle"
+        )
         .innerHTML =
         "☀️ Check-in";
 
@@ -703,15 +705,16 @@ document
 };
 
 
-// ==========================================
+// =====================================================
 // CHECK-OUT
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnHomeCheckOut")
 .onclick = ()=>{
 
-    currentMode = "CHECKOUT";
+    currentMode =
+        "CHECKOUT";
 
     sessionId = "";
 
@@ -723,21 +726,24 @@ document
 };
 
 
-// ==========================================
-// CHECK-OUT: CHỤP ẢNH
-// ==========================================
+// =====================================================
+// CHECK-OUT - CHỤP ẢNH
+// =====================================================
 
 document
 .getElementById("btnCheckoutPhoto")
 .onclick = ()=>{
 
-    currentMode = "CHECKOUT";
+    currentMode =
+        "CHECKOUT";
 
     sessionId =
         createSessionId();
 
     document
-        .getElementById("cameraSettingTitle")
+        .getElementById(
+            "cameraSettingTitle"
+        )
         .innerHTML =
         "🌙 Chụp ảnh Check-out";
 
@@ -749,15 +755,16 @@ document
 };
 
 
-// ==========================================
-// CHECK-OUT: LÀM BÁO CÁO
-// ==========================================
+// =====================================================
+// CHECK-OUT - LÀM BÁO CÁO
+// =====================================================
 
 document
 .getElementById("btnCheckoutReport")
 .onclick = ()=>{
 
-    currentMode = "CHECKOUT";
+    currentMode =
+        "CHECKOUT";
 
     sessionId = "";
 
@@ -767,17 +774,20 @@ document
 };
 
 
-// ==========================================
+// =====================================================
 // BACK
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnCheckoutBack")
 .onclick = ()=>{
 
-    showPage("homePage");
+    showPage(
+        "homePage"
+    );
 
 };
+
 
 document
 .getElementById("btnCameraSettingBack")
@@ -789,7 +799,8 @@ document
             "homePage"
         );
 
-    }else{
+    }
+    else{
 
         showPage(
             "checkoutChoicePage",
@@ -801,9 +812,9 @@ document
 };
 
 
-// ==========================================
+// =====================================================
 // OPEN CAMERA
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnOpenCamera")
@@ -832,17 +843,6 @@ async function openCamera(){
     }
 
     try{
-
-        if(
-            !navigator.mediaDevices ||
-            !navigator.mediaDevices.getUserMedia
-        ){
-
-            throw new Error(
-                "Thiết bị/trình duyệt không hỗ trợ camera."
-            );
-
-        }
 
         const constraints = {
 
@@ -916,7 +916,6 @@ async function openCamera(){
             "Hãy cho phép Camera rồi thử lại.";
 
         }
-
         else if(
             error.name ===
             "NotFoundError"
@@ -926,7 +925,6 @@ async function openCamera(){
             "❌ Không tìm thấy camera trên thiết bị.";
 
         }
-
         else{
 
             message +=
@@ -944,9 +942,9 @@ async function openCamera(){
 }
 
 
-// ==========================================
+// =====================================================
 // SWITCH CAMERA
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnSwitchCamera")
@@ -962,9 +960,9 @@ document
 };
 
 
-// ==========================================
+// =====================================================
 // CAPTURE
-// ==========================================
+// =====================================================
 
 function handleCapture(e){
 
@@ -993,16 +991,6 @@ function handleCapture(e){
         video.clientHeight ||
         window.innerHeight;
 
-    if(!width || !height){
-
-        alert(
-            "Camera chưa sẵn sàng. Vui lòng thử lại."
-        );
-
-        return;
-
-    }
-
     canvas.width =
         width;
 
@@ -1012,27 +1000,13 @@ function handleCapture(e){
     const ctx =
         canvas.getContext("2d");
 
-    try{
-
-        ctx.drawImage(
-            video,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-    }
-
-    catch(error){
-
-        alert(
-            "Không thể chụp ảnh. Vui lòng thử lại."
-        );
-
-        return;
-
-    }
+    ctx.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
 
     capturedImage =
         canvas.toDataURL(
@@ -1043,9 +1017,11 @@ function handleCapture(e){
     stopCamera();
 
     document
-    .getElementById("previewImage")
+    .getElementById(
+        "previewImage"
+    )
     .src =
-    capturedImage;
+        capturedImage;
 
     showPage(
         "previewPage",
@@ -1061,9 +1037,9 @@ document
 handleCapture;
 
 
-// ==========================================
+// =====================================================
 // STOP CAMERA
-// ==========================================
+// =====================================================
 
 function stopCamera(){
 
@@ -1080,9 +1056,9 @@ function stopCamera(){
 }
 
 
-// ==========================================
+// =====================================================
 // CANCEL CAMERA
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnCancelCamera")
@@ -1097,7 +1073,8 @@ document
             "CHECKIN"
         );
 
-    }else{
+    }
+    else{
 
         showPage(
             "cameraSettingPage",
@@ -1109,9 +1086,9 @@ document
 };
 
 
-// ==========================================
+// =====================================================
 // RETAKE
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnRetake")
@@ -1122,9 +1099,9 @@ document
 };
 
 
-// ==========================================
+// =====================================================
 // DEVICE INFO
-// ==========================================
+// =====================================================
 
 function getDeviceInfo(){
 
@@ -1137,89 +1114,85 @@ function getDeviceInfo(){
     let device =
         "Desktop";
 
-
     if(
-        ua.indexOf("SamsungBrowser") > -1
-    ){
-
-        browser="Samsung Internet";
-
-    }
-
-    else if(
         ua.indexOf("Firefox") > -1
     ){
 
-        browser="Firefox";
+        browser =
+            "Firefox";
 
     }
-
     else if(
-        ua.indexOf("OPR") > -1 ||
-        ua.indexOf("Opera") > -1
+        ua.indexOf("SamsungBrowser") > -1
     ){
 
-        browser="Opera";
+        browser =
+            "Samsung Internet";
 
     }
+    else if(
+        ua.indexOf("Opera") > -1 ||
+        ua.indexOf("OPR") > -1
+    ){
 
+        browser =
+            "Opera";
+
+    }
     else if(
         ua.indexOf("Edg") > -1
     ){
 
-        browser="Chromium Edge";
+        browser =
+            "Chromium Edge";
 
     }
-
     else if(
         ua.indexOf("Chrome") > -1
     ){
 
-        browser="Chrome";
+        browser =
+            "Chrome";
 
     }
-
     else if(
         ua.indexOf("Safari") > -1
     ){
 
-        browser="Safari";
+        browser =
+            "Safari";
 
     }
-
 
     if(
         /android/i.test(ua)
     ){
 
         device =
-        "Android Phone/Tablet";
+            "Android Phone/Tablet";
 
     }
-
     else if(
         /iPad|iPhone|iPod/.test(ua) &&
         !window.MSStream
     ){
 
         device =
-        "iOS (iPhone/iPad)";
+            "iOS (iPhone/iPad)";
 
     }
-
     else if(
         /Mobile|Android|BlackBerry|IEMobile|Kindle|Silk|Opera Mini/i.test(ua)
     ){
 
         device =
-        "Mobile Other";
+            "Mobile Other";
 
     }
-
     else{
 
         device =
-        "PC / Desktop";
+            "PC / Desktop";
 
     }
 
@@ -1231,9 +1204,9 @@ function getDeviceInfo(){
 }
 
 
-// ==========================================
+// =====================================================
 // UPLOAD
-// ==========================================
+// =====================================================
 
 async function uploadImage(){
 
@@ -1264,7 +1237,6 @@ async function uploadImage(){
 
         };
 
-
         const response =
             await fetch(
                 SCRIPT_URL,
@@ -1273,7 +1245,7 @@ async function uploadImage(){
 
                     headers:{
                         "Content-Type":
-                        "text/plain;charset=utf-8"
+                            "text/plain;charset=utf-8"
                     },
 
                     body:
@@ -1283,10 +1255,8 @@ async function uploadImage(){
                 }
             );
 
-
         const result =
             await response.json();
-
 
         if(!response.ok){
 
@@ -1296,7 +1266,6 @@ async function uploadImage(){
             );
 
         }
-
 
         if(result.success !== true){
 
@@ -1308,9 +1277,9 @@ async function uploadImage(){
         }
 
 
-        // ==================================
+        // =================================================
         // CHECK-IN
-        // ==================================
+        // =================================================
 
         if(
             currentMode ===
@@ -1332,24 +1301,27 @@ async function uploadImage(){
 
             }
 
-            const url =
-                CHECKIN_FORM +
-                "&entry.1183006421=" +
-                encodeURIComponent(
-                    sessionId
-                );
+            // Tạo URL Google Form tự điền
+            const reportUrl =
+                buildReportUrl();
 
+            console.log(
+                "CHECK-IN REPORT URL:",
+                reportUrl
+            );
+
+            // Mở Form Check-in
             window.location.href =
-                url;
+                reportUrl;
 
             return;
 
         }
 
 
-        // ==================================
+        // =================================================
         // CHECK-OUT
-        // ==================================
+        // =================================================
 
         if(
             currentMode ===
@@ -1368,7 +1340,7 @@ async function uploadImage(){
                 "finishDescription"
             )
             .textContent =
-                "Ảnh Check-out đã được lưu. Hãy giữ lại Session ID để ghép ảnh với báo cáo.";
+                "Ảnh Check-out đã được lưu. Khi bấm tiếp tục, Session ID sẽ tự điền vào báo cáo.";
 
             showPage(
                 "finishPage",
@@ -1383,7 +1355,7 @@ async function uploadImage(){
 
     catch(error){
 
-        console.log(
+        console.error(
             "UPLOAD ERROR:",
             error
         );
@@ -1403,9 +1375,9 @@ async function uploadImage(){
 }
 
 
-// ==========================================
+// =====================================================
 // UPLOAD BUTTON
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnUpload")
@@ -1441,9 +1413,9 @@ document
 };
 
 
-// ==========================================
+// =====================================================
 // COPY SESSION ID
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnCopySession")
@@ -1467,18 +1439,20 @@ document
             sessionId
         );
 
-        const btn =
-            document
-            .getElementById(
-                "btnCopySession"
-            );
-
-        btn.textContent =
+        document
+        .getElementById(
+            "btnCopySession"
+        )
+        .textContent =
             "✅ Đã copy Session ID";
 
         setTimeout(()=>{
 
-            btn.textContent =
+            document
+            .getElementById(
+                "btnCopySession"
+            )
+            .textContent =
                 "📋 Copy Session ID";
 
         },2000);
@@ -1497,77 +1471,53 @@ document
 };
 
 
-// ==========================================
+// =====================================================
 // CONTINUE REPORT
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnContinueReport")
 .onclick = ()=>{
 
-    if(
-        currentMode ===
-        "CHECKOUT"
-    ){
+    if(!sessionId){
 
-        if(!sessionId){
-
-            alert(
-                "Không tìm thấy Session ID."
-            );
-
-            return;
-
-        }
-
-        const url =
-            CHECKOUT_FORM +
-            "&entry.432817307=" +
-            encodeURIComponent(
-                sessionId
-            );
-
-        window.location.href =
-            url;
+        alert(
+            "Không tìm thấy Session ID."
+        );
 
         return;
 
     }
 
+    try{
 
-    if(
-        currentMode ===
-        "CHECKIN"
-    ){
+        const reportUrl =
+            buildReportUrl();
 
-        if(!sessionId){
-
-            alert(
-                "Không tìm thấy Session ID."
-            );
-
-            return;
-
-        }
-
-        const url =
-            CHECKIN_FORM +
-            "&entry.1183006421=" +
-            encodeURIComponent(
-                sessionId
-            );
+        console.log(
+            "REPORT URL:",
+            reportUrl
+        );
 
         window.location.href =
-            url;
+            reportUrl;
+
+    }
+
+    catch(error){
+
+        alert(
+            error.message
+        );
 
     }
 
 };
 
 
-// ==========================================
+// =====================================================
 // FINISH
-// ==========================================
+// =====================================================
 
 document
 .getElementById("btnFinish")
