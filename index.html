@@ -77,7 +77,6 @@ html,body{
     color:#666;
     font-size:15px;
     margin-bottom:20px;
-    line-height:1.5;
 }
 
 button{
@@ -128,12 +127,7 @@ button:disabled{
     color:white;
 }
 
-.btnReport{
-    background:#2563eb;
-    color:white;
-}
-
-.btnDanger{
+.btnReportWarning{
     background:#dc2626;
     color:white;
 }
@@ -184,22 +178,10 @@ button:disabled{
     line-height:1.5;
 }
 
-.errorBox{
-    margin:12px 0;
-    padding:14px;
-    border-radius:12px;
-    background:#fef2f2;
-    border:1px solid #fecaca;
-    color:#991b1b;
-    font-size:14px;
-    line-height:1.5;
-    text-align:center;
-}
-
-.warningBox{
-    margin:12px 0;
-    padding:14px;
-    border-radius:12px;
+.retryInfo{
+    margin-top:12px;
+    padding:12px;
+    border-radius:10px;
     background:#fff7ed;
     border:1px solid #fed7aa;
     color:#9a3412;
@@ -465,7 +447,7 @@ type="button">
 <section id="cameraPage" class="page camera-page">
 
 <div class="cameraGuideBanner">
-📷 Đang ở chế độ CHỤP ẢNH
+📷 Đang ở chế độ CHỤP ẢNH (Bấm nút tròn để chụp)
 </div>
 
 <video
@@ -528,6 +510,12 @@ class="photoInfo">
 Ảnh đã được tối ưu để tải nhanh hơn.
 </div>
 
+<div
+id="retryInfo"
+class="retryInfo"
+style="display:none;">
+</div>
+
 <button
 id="btnRetake"
 type="button">
@@ -541,55 +529,12 @@ type="button">
 ⬆ Lưu ảnh
 </button>
 
-</div>
-
-</section>
-
-
-<!-- ================= FAIL / REPORT ================= -->
-
-<section id="uploadFailPage" class="page">
-
-<div class="card">
-
-<h2>
-⚠️ Không thể lưu ảnh
-</h2>
-
-<div
-id="uploadFailMessage"
-class="errorBox">
-Ảnh chưa thể lưu vào hệ thống.
-</div>
-
-<div
-id="uploadFailCount"
-class="warningBox">
-</div>
-
-<p class="subtitle">
-Session ID vẫn được giữ nguyên.
-Bạn có thể tiếp tục thử lại hoặc chuyển sang báo cáo.
-</p>
-
 <button
-id="btnFailRetake"
-type="button">
-🔄 Chụp lại và thử lại
-</button>
-
-<button
-id="btnFailReport"
-class="btnReport"
-type="button">
-📝 Chuyển sang báo cáo
-</button>
-
-<button
-id="btnFailHome"
-class="btnBack"
-type="button">
-⬅ Về trang chính
+id="btnCheckinReportAfterRetry"
+class="btnReportWarning"
+type="button"
+style="display:none;">
+📝 Chuyển sang báo cáo Check-in
 </button>
 
 </div>
@@ -646,12 +591,10 @@ type="button">
 <div class="card">
 
 <h2>
-✅ Hoàn tất
+✅ Hoàn tất Check-out
 </h2>
 
-<p
-id="sessionResultDescription"
-class="subtitle">
+<p class="subtitle">
 Ảnh đã được lưu thành công.
 </p>
 
@@ -724,25 +667,24 @@ let capturedImage = "";
 let sessionId = "";
 let isUploading = false;
 
+/*
+ * Số lần người dùng CHỤP LẠI.
+ *
+ * 0 = ảnh đầu tiên
+ * 1 = chụp lại lần 1
+ * 2 = chụp lại lần 2
+ * 3 = chụp lại lần 3
+ * 4 = chụp lại lần 4
+ *
+ * Khi đạt 4 lần chụp lại,
+ * Check-in sẽ hiện nút chuyển sang báo cáo.
+ */
+let retakeCount = 0;
 
-/* ==========================================
-   ĐẾM SỐ LẦN UPLOAD LỖI
-   ========================================== */
 
-let uploadFailCount = 0;
-
-
-/* ==========================================
-   GIỚI HẠN LỖI
-   Lỗi lần thứ 4 -> chuyển báo cáo
-   ========================================== */
-
-const MAX_UPLOAD_FAILURES = 3;
-
-
-/* ==========================================
-   URL
-   ========================================== */
+// ==========================================
+// URL
+// ==========================================
 
 const SCRIPT_URL =
 "https://script.google.com/macros/s/AKfycbzQa4AAsZU9gPnvU9z8z0F9dl6cP38ALx_yhwPqLUdMu9SQatQyiHDoQuYh0d823uhJ/exec";
@@ -754,6 +696,7 @@ const CHECKOUT_FORM =
 "https://docs.google.com/forms/d/e/1FAIpQLSe-f946yjSe9lr6iVp4kzvzGHGlHxHzg-uhOyJpzuleh-raLQ/viewform?usp=pp_url";
 
 
+// Session ID entry
 const CHECKIN_SESSION_ENTRY =
 "entry.17087712";
 
@@ -761,18 +704,22 @@ const CHECKOUT_SESSION_ENTRY =
 "entry.432817307";
 
 
-/* ==========================================
-   ẢNH - TỐI ƯU IPHONE / ANDROID
-   ========================================== */
+// ==========================================
+// ẢNH - TỐI ƯU CHO IPHONE / ANDROID
+// ==========================================
 
+// Cạnh dài tối đa.
+// Không crop, chỉ resize giữ nguyên tỷ lệ.
 const MAX_IMAGE_SIZE = 1920;
 
+// JPEG quality.
+// 0.80 đủ rõ cho ảnh báo cáo và giảm dung lượng.
 const IMAGE_QUALITY = 0.80;
 
 
-/* ==========================================
-   TẠO SESSION ID
-   ========================================== */
+// ==========================================
+// TẠO SESSION ID
+// ==========================================
 
 function createSessionId(){
 
@@ -793,28 +740,36 @@ function createSessionId(){
 }
 
 
-/* ==========================================
-   RESET PHIÊN
-   ========================================== */
+// ==========================================
+// RESET SESSION
+// ==========================================
 
 function resetSession(){
 
     capturedImage = "";
     sessionId = "";
     currentMode = "";
-    uploadFailCount = 0;
     isUploading = false;
+    retakeCount = 0;
 
     document
-    .getElementById("sessionValue")
-    .textContent = "";
+    .getElementById(
+        "retryInfo"
+    )
+    .style.display = "none";
+
+    document
+    .getElementById(
+        "btnCheckinReportAfterRetry"
+    )
+    .style.display = "none";
 
 }
 
 
-/* ==========================================
-   SHOW PAGE
-   ========================================== */
+// ==========================================
+// SHOW PAGE
+// ==========================================
 
 function showPage(id,mode=""){
 
@@ -837,7 +792,6 @@ function showPage(id,mode=""){
         id === "checkoutChoicePage" ||
         id === "cameraSettingPage" ||
         id === "previewPage" ||
-        id === "uploadFailPage" ||
         id === "finishPage" ||
         id === "sessionPage"
     ){
@@ -872,20 +826,20 @@ function showPage(id,mode=""){
 }
 
 
-/* ==========================================
-   CHECK-IN
-   ========================================== */
+// ==========================================
+// CHECK-IN
+// ==========================================
 
 document
 .getElementById("btnHomeCheckIn")
 .onclick = ()=>{
 
+    resetSession();
+
     currentMode = "CHECKIN";
 
     sessionId =
         createSessionId();
-
-    uploadFailCount = 0;
 
     document
         .getElementById("cameraSettingTitle")
@@ -900,19 +854,19 @@ document
 };
 
 
-/* ==========================================
-   CHECK-OUT
-   ========================================== */
+// ==========================================
+// CHECK-OUT
+// ==========================================
 
 document
 .getElementById("btnHomeCheckOut")
 .onclick = ()=>{
 
+    resetSession();
+
     currentMode = "CHECKOUT";
 
     sessionId = "";
-
-    uploadFailCount = 0;
 
     showPage(
         "checkoutChoicePage",
@@ -922,20 +876,20 @@ document
 };
 
 
-/* ==========================================
-   CHECK-OUT: CHỤP ẢNH
-   ========================================== */
+// ==========================================
+// CHECK-OUT: CHỤP ẢNH
+// ==========================================
 
 document
 .getElementById("btnCheckoutPhoto")
 .onclick = ()=>{
 
+    resetSession();
+
     currentMode = "CHECKOUT";
 
     sessionId =
         createSessionId();
-
-    uploadFailCount = 0;
 
     document
         .getElementById("cameraSettingTitle")
@@ -950,9 +904,9 @@ document
 };
 
 
-/* ==========================================
-   CHECK-OUT: LÀM BÁO CÁO
-   ========================================== */
+// ==========================================
+// CHECK-OUT: LÀM BÁO CÁO
+// ==========================================
 
 document
 .getElementById("btnCheckoutReport")
@@ -962,17 +916,15 @@ document
 
     sessionId = "";
 
-    uploadFailCount = 0;
-
     window.location.href =
         CHECKOUT_FORM;
 
 };
 
 
-/* ==========================================
-   BACK
-   ========================================== */
+// ==========================================
+// BACK
+// ==========================================
 
 document
 .getElementById("btnCheckoutBack")
@@ -1005,9 +957,9 @@ document
 };
 
 
-/* ==========================================
-   OPEN CAMERA
-   ========================================== */
+// ==========================================
+// OPEN CAMERA
+// ==========================================
 
 document
 .getElementById("btnOpenCamera")
@@ -1051,11 +1003,15 @@ async function openCamera(){
         const constraints = {
 
             video:{
-
                 facingMode:{
                     ideal:currentCamera
                 },
 
+                /*
+                 * Không ép camera xuống độ phân giải thấp.
+                 * Browser/iPhone/Android tự chọn độ phân giải
+                 * phù hợp với camera thiết bị.
+                 */
                 width:{
                     ideal:1920
                 },
@@ -1063,7 +1019,6 @@ async function openCamera(){
                 height:{
                     ideal:1920
                 }
-
             },
 
             audio:false
@@ -1158,9 +1113,9 @@ async function openCamera(){
 }
 
 
-/* ==========================================
-   SWITCH CAMERA
-   ========================================== */
+// ==========================================
+// SWITCH CAMERA
+// ==========================================
 
 document
 .getElementById("btnSwitchCamera")
@@ -1176,9 +1131,9 @@ document
 };
 
 
-/* ==========================================
-   CAPTURE
-   ========================================== */
+// ==========================================
+// CAPTURE
+// ==========================================
 
 function handleCapture(e){
 
@@ -1227,6 +1182,11 @@ function handleCapture(e){
     let sourceHeight =
         video.videoHeight;
 
+
+    // ======================================
+    // GIỮ NGUYÊN TỶ LỆ
+    // ======================================
+
     let targetWidth =
         sourceWidth;
 
@@ -1260,11 +1220,13 @@ function handleCapture(e){
 
     }
 
+
     canvas.width =
         targetWidth;
 
     canvas.height =
         targetHeight;
+
 
     const ctx =
         canvas.getContext(
@@ -1274,11 +1236,13 @@ function handleCapture(e){
             }
         );
 
+
     ctx.imageSmoothingEnabled =
         true;
 
     ctx.imageSmoothingQuality =
         "high";
+
 
     ctx.drawImage(
         video,
@@ -1288,13 +1252,20 @@ function handleCapture(e){
         targetHeight
     );
 
+
+    // ======================================
+    // NÉN JPEG
+    // ======================================
+
     capturedImage =
         canvas.toDataURL(
             "image/jpeg",
             IMAGE_QUALITY
         );
 
+
     stopCamera();
+
 
     document
     .getElementById(
@@ -1302,6 +1273,11 @@ function handleCapture(e){
     )
     .src =
     capturedImage;
+
+
+    // ======================================
+    // THÔNG TIN ẢNH
+    // ======================================
 
     const approxBytes =
         Math.round(
@@ -1315,6 +1291,7 @@ function handleCapture(e){
             1024
         ).toFixed(2);
 
+
     document
     .getElementById(
         "photoInfo"
@@ -1327,6 +1304,10 @@ function handleCapture(e){
         " px • khoảng " +
         approxMB +
         " MB";
+
+
+    updateRetryUI();
+
 
     showPage(
         "previewPage",
@@ -1342,9 +1323,9 @@ document
 handleCapture;
 
 
-/* ==========================================
-   STOP CAMERA
-   ========================================== */
+// ==========================================
+// STOP CAMERA
+// ==========================================
 
 function stopCamera(){
 
@@ -1361,9 +1342,9 @@ function stopCamera(){
 }
 
 
-/* ==========================================
-   CANCEL CAMERA
-   ========================================== */
+// ==========================================
+// CANCEL CAMERA
+// ==========================================
 
 document
 .getElementById("btnCancelCamera")
@@ -1390,9 +1371,91 @@ document
 };
 
 
-/* ==========================================
-   RETAKE
-   ========================================== */
+// ==========================================
+// RETRY UI
+// ==========================================
+
+function updateRetryUI(){
+
+    const retryInfo =
+        document.getElementById(
+            "retryInfo"
+        );
+
+    const reportButton =
+        document.getElementById(
+            "btnCheckinReportAfterRetry"
+        );
+
+
+    if(currentMode !== "CHECKIN"){
+
+        retryInfo.style.display =
+            "none";
+
+        reportButton.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    /*
+     * retakeCount:
+     *
+     * 0 = ảnh đầu tiên
+     * 1 = đã chụp lại lần 1
+     * 2 = đã chụp lại lần 2
+     * 3 = đã chụp lại lần 3
+     * 4 = đã chụp lại lần 4
+     *
+     * Sau lần chụp lại thứ 3,
+     * lần tiếp theo là lần thứ 4.
+     */
+
+    if(retakeCount < 3){
+
+        retryInfo.style.display =
+            "block";
+
+        retryInfo.textContent =
+            "Bạn đã chụp lại " +
+            retakeCount +
+            "/3 lần. Nếu ảnh chưa đạt, bạn có thể chụp lại.";
+
+        reportButton.style.display =
+            "none";
+
+    }
+
+    else{
+
+        retryInfo.style.display =
+            "block";
+
+        retryInfo.textContent =
+            "⚠️ Bạn đã chụp lại 3 lần. Nếu tiếp tục lỗi, hãy chuyển sang báo cáo.";
+
+        /*
+         * Nút báo cáo được bật sau khi
+         * người dùng đã chụp lại 3 lần.
+         *
+         * Tức là ảnh hiện tại đã là lần
+         * chụp thứ 4.
+         */
+
+        reportButton.style.display =
+            "block";
+
+    }
+
+}
+
+
+// ==========================================
+// RETAKE
+// ==========================================
 
 document
 .getElementById("btnRetake")
@@ -1408,6 +1471,12 @@ document
 
     }
 
+    /*
+     * Chỉ đếm số lần CHỤP LẠI.
+     * Ảnh đầu tiên = 0.
+     */
+    retakeCount++;
+
     capturedImage = "";
 
     openCamera();
@@ -1415,9 +1484,41 @@ document
 };
 
 
-/* ==========================================
-   DEVICE INFO
-   ========================================== */
+// ==========================================
+// CHECK-IN:
+// CHUYỂN SANG BÁO CÁO SAU KHI CHỤP LỖI
+// ==========================================
+
+document
+.getElementById(
+    "btnCheckinReportAfterRetry"
+)
+.onclick = ()=>{
+
+    if(currentMode !== "CHECKIN"){
+
+        return;
+
+    }
+
+    if(!sessionId){
+
+        alert(
+            "Không tìm thấy Session ID."
+        );
+
+        return;
+
+    }
+
+    openReportWithSession();
+
+};
+
+
+// ==========================================
+// DEVICE INFO
+// ==========================================
 
 function getDeviceInfo(){
 
@@ -1474,6 +1575,7 @@ function getDeviceInfo(){
 
     }
 
+
     if(
         /android/i.test(ua)
     ){
@@ -1517,9 +1619,9 @@ function getDeviceInfo(){
 }
 
 
-/* ==========================================
-   FORM URL + SESSION ID
-   ========================================== */
+// ==========================================
+// TẠO URL FORM CÓ SESSION ID
+// ==========================================
 
 function getReportUrl(){
 
@@ -1574,9 +1676,9 @@ function getReportUrl(){
 }
 
 
-/* ==========================================
-   MỞ FORM
-   ========================================== */
+// ==========================================
+// MỞ FORM + TỰ ĐIỀN SESSION ID
+// ==========================================
 
 function openReportWithSession(){
 
@@ -1584,7 +1686,7 @@ function openReportWithSession(){
 
         alert(
             "Không tìm thấy Session ID.\n\n" +
-            "Vui lòng thực hiện lại thao tác."
+            "Vui lòng thực hiện lại thao tác chụp ảnh."
         );
 
         return;
@@ -1615,64 +1717,9 @@ function openReportWithSession(){
 }
 
 
-/* ==========================================
-   HIỂN THỊ MÀN HÌNH LỖI
-   ========================================== */
-
-function showUploadFailure(errorMessage){
-
-    const count =
-        uploadFailCount;
-
-    document
-    .getElementById(
-        "uploadFailMessage"
-    )
-    .textContent =
-        "Ảnh chưa được lưu. " +
-        (
-            errorMessage ||
-            "Không xác định được nguyên nhân."
-        );
-
-    document
-    .getElementById(
-        "uploadFailCount"
-    )
-    .textContent =
-        "Đã lỗi " +
-        count +
-        "/" +
-        MAX_UPLOAD_FAILURES +
-        " lần.";
-
-    if(
-        count >=
-        MAX_UPLOAD_FAILURES
-    ){
-
-        document
-        .getElementById(
-            "uploadFailCount"
-        )
-        .textContent =
-            "⚠️ Đã lỗi " +
-            count +
-            " lần. Bạn có thể thử lại hoặc chuyển sang báo cáo.";
-
-    }
-
-    showPage(
-        "uploadFailPage",
-        currentMode
-    );
-
-}
-
-
-/* ==========================================
-   UPLOAD
-   ========================================== */
+// ==========================================
+// UPLOAD
+// ==========================================
 
 async function uploadImage(){
 
@@ -1684,10 +1731,12 @@ async function uploadImage(){
 
     isUploading = true;
 
+
     const uploadButton =
         document.getElementById(
             "btnUpload"
         );
+
 
     try{
 
@@ -1699,6 +1748,7 @@ async function uploadImage(){
 
         }
 
+
         if(!sessionId){
 
             throw new Error(
@@ -1707,8 +1757,10 @@ async function uploadImage(){
 
         }
 
+
         const info =
             getDeviceInfo();
+
 
         const payload = {
 
@@ -1732,8 +1784,10 @@ async function uploadImage(){
 
         };
 
+
         uploadButton.disabled =
             true;
+
 
         const response =
             await fetch(
@@ -1753,6 +1807,7 @@ async function uploadImage(){
                 }
             );
 
+
         if(!response.ok){
 
             throw new Error(
@@ -1762,26 +1817,19 @@ async function uploadImage(){
 
         }
 
+
         const result =
             await response.json();
+
 
         if(
             result &&
             result.success === true
         ){
 
-            /*
-             * UPLOAD THÀNH CÔNG
-             *
-             * Reset số lần lỗi.
-             */
-
-            uploadFailCount = 0;
-
-
-            /* ==========================
-               CHECK-IN
-               ========================== */
+            // ==================================
+            // CHECK-IN
+            // ==================================
 
             if(
                 currentMode ===
@@ -1796,6 +1844,11 @@ async function uploadImage(){
 
                 }
 
+                /*
+                 * Chỉ chuyển sang Form
+                 * SAU KHI Apps Script trả success.
+                 */
+
                 openReportWithSession();
 
                 return;
@@ -1803,9 +1856,9 @@ async function uploadImage(){
             }
 
 
-            /* ==========================
-               CHECK-OUT
-               ========================== */
+            // ==================================
+            // CHECK-OUT
+            // ==================================
 
             if(
                 currentMode ===
@@ -1831,11 +1884,16 @@ async function uploadImage(){
         }
 
 
+        // ======================================
+        // SERVER TRẢ SUCCESS = FALSE
+        // ======================================
+
         const serverError =
             result &&
             result.error
             ? result.error
-            : "Server không xác nhận lưu ảnh.";
+            : "Không rõ nguyên nhân";
+
 
         throw new Error(
             serverError
@@ -1852,31 +1910,22 @@ async function uploadImage(){
 
 
         /*
-         * QUAN TRỌNG:
-         *
-         * Chỉ tăng bộ đếm lỗi.
-         *
-         * KHÔNG XÓA:
-         * - sessionId
-         * - currentMode
-         *
+         * Không xóa Session ID.
+         * Người dùng có thể lưu lại ảnh
+         * hoặc chụp lại.
          */
 
-        uploadFailCount++;
+        alert(
+            "❌ LƯU ẢNH THẤT BẠI\n\n" +
+            "Ảnh chưa được lưu vào hệ thống.\n" +
+            "Vui lòng chụp lại ảnh rồi thử lưu lại.\n\n" +
+            "Session ID vẫn được giữ nguyên."
+        );
 
 
-        /*
-         * Nếu lỗi lần 1-3:
-         * vẫn cho thử lại.
-         *
-         * Nếu lỗi lần 4:
-         * vẫn giữ Session ID,
-         * nhưng chuyển sang màn hình
-         * lựa chọn thử lại / báo cáo.
-         */
-
-        showUploadFailure(
-            error.message
+        showPage(
+            "previewPage",
+            currentMode
         );
 
     }
@@ -1894,9 +1943,9 @@ async function uploadImage(){
 }
 
 
-/* ==========================================
-   UPLOAD BUTTON
-   ========================================== */
+// ==========================================
+// UPLOAD BUTTON
+// ==========================================
 
 document
 .getElementById("btnUpload")
@@ -1938,82 +1987,10 @@ document
 };
 
 
-/* ==========================================
-   LỖI -> CHỤP LẠI
-   ========================================== */
-
-document
-.getElementById("btnFailRetake")
-.onclick = ()=>{
-
-    if(!sessionId){
-
-        alert(
-            "Không tìm thấy Session ID."
-        );
-
-        return;
-
-    }
-
-    capturedImage = "";
-
-    openCamera();
-
-};
-
-
-/* ==========================================
-   LỖI -> CHUYỂN BÁO CÁO
-   ========================================== */
-
-document
-.getElementById("btnFailReport")
-.onclick = ()=>{
-
-    if(!sessionId){
-
-        alert(
-            "Không tìm thấy Session ID."
-        );
-
-        return;
-
-    }
-
-    /*
-     * Không xóa Session ID.
-     * Form sẽ nhận Session ID hiện tại.
-     */
-
-    openReportWithSession();
-
-};
-
-
-/* ==========================================
-   LỖI -> VỀ TRANG CHÍNH
-   ========================================== */
-
-document
-.getElementById("btnFailHome")
-.onclick = ()=>{
-
-    stopCamera();
-
-    resetSession();
-
-    showPage(
-        "homePage"
-    );
-
-};
-
-
-/* ==========================================
-   CHECK-OUT:
-   LƯU HÌNH + TIẾP TỤC BÁO CÁO
-   ========================================== */
+// ==========================================
+// CHECK-OUT:
+// LƯU HÌNH + TIẾP TỤC BÁO CÁO
+// ==========================================
 
 document
 .getElementById("btnContinueReport")
@@ -2040,10 +2017,10 @@ document
 };
 
 
-/* ==========================================
-   CHECK-OUT:
-   LƯU HÌNH VÀ KẾT THÚC
-   ========================================== */
+// ==========================================
+// CHECK-OUT:
+// LƯU HÌNH VÀ KẾT THÚC
+// ==========================================
 
 document
 .getElementById("btnFinish")
@@ -2070,13 +2047,6 @@ document
 
     document
     .getElementById(
-        "sessionResultDescription"
-    )
-    .textContent =
-        "Ảnh Check-out đã được lưu thành công.";
-
-    document
-    .getElementById(
         "sessionValue"
     )
     .textContent =
@@ -2090,9 +2060,9 @@ document
 };
 
 
-/* ==========================================
-   QUAY LẠI TỪ MÀN HÌNH CUỐI
-   ========================================== */
+// ==========================================
+// QUAY LẠI TỪ MÀN HÌNH CUỐI
+// ==========================================
 
 document
 .getElementById("btnFinishBack")
@@ -2106,9 +2076,9 @@ document
 };
 
 
-/* ==========================================
-   COPY SESSION ID
-   ========================================== */
+// ==========================================
+// COPY SESSION ID
+// ==========================================
 
 document
 .getElementById("btnCopySession")
@@ -2176,9 +2146,9 @@ document
 };
 
 
-/* ==========================================
-   KẾT THÚC
-   ========================================== */
+// ==========================================
+// KẾT THÚC SAU KHI ĐÃ COPY
+// ==========================================
 
 document
 .getElementById("btnSessionHome")
@@ -2187,6 +2157,12 @@ document
     stopCamera();
 
     resetSession();
+
+    document
+    .getElementById(
+        "sessionValue"
+    )
+    .textContent = "";
 
     showPage(
         "homePage"
