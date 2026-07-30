@@ -100,6 +100,7 @@ button:active{
 
 button:disabled{
     opacity:.5;
+    cursor:not-allowed;
 }
 
 .btnBack{
@@ -159,6 +160,17 @@ button:disabled{
     font-size:14px;
     line-height:1.5;
     text-align:center;
+}
+
+.photoInfo{
+    margin:10px 0 14px;
+    padding:10px 12px;
+    border-radius:10px;
+    background:#f3f4f6;
+    color:#666;
+    font-size:13px;
+    text-align:center;
+    line-height:1.5;
 }
 
 .camera-page{
@@ -235,7 +247,7 @@ button:disabled{
     max-height:50vh;
     object-fit:contain;
     border-radius:14px;
-    margin-bottom:14px;
+    margin-bottom:10px;
 }
 
 .loader{
@@ -370,7 +382,18 @@ class="btnBack">
 Chọn Camera
 </label>
 
-<select id="cameraSelect">
+<select
+id="cameraSelect"
+style="
+width:100%;
+height:48px;
+margin-top:8px;
+padding:0 12px;
+border:1px solid #ccc;
+border-radius:12px;
+font-size:16px;
+background:white;
+">
 
 <option value="environment">
 📷 Camera sau
@@ -463,6 +486,12 @@ Xem lại ảnh
 
 <img id="previewImage">
 
+<div
+id="photoInfo"
+class="photoInfo">
+Ảnh đã được tối ưu để tải nhanh hơn.
+</div>
+
 <button
 id="btnRetake"
 type="button">
@@ -551,8 +580,8 @@ class="sessionValue">
 </div>
 
 <div class="sessionNote">
-Vui lòng bấm <b>Copy</b> để lưu mã Session ID,
-sau đó dán mã này vào ứng dụng khác để tránh bị mất.
+Vui lòng bấm <b>Copy Session ID</b> để lưu lại mã.
+Sau đó dán mã vào ứng dụng khác để tránh bị mất.
 </div>
 
 <button
@@ -604,6 +633,7 @@ let stream = null;
 let currentCamera = "environment";
 let capturedImage = "";
 let sessionId = "";
+let isUploading = false;
 
 
 // ==========================================
@@ -612,11 +642,6 @@ let sessionId = "";
 
 const SCRIPT_URL =
 "https://script.google.com/macros/s/AKfycbzQa4AAsZU9gPnvU9z8z0F9dl6cP38ALx_yhwPqLUdMu9SQatQyiHDoQuYh0d823uhJ/exec";
-
-
-// QUAN TRỌNG:
-// Dùng VIEWFORM để người dùng có thể tiếp tục nhập form.
-// Không dùng formResponse ở đây.
 
 const CHECKIN_FORM =
 "https://docs.google.com/forms/d/e/1FAIpQLSchaY-0UJIstKxnNRIDgE-bx7VAiDP1DLWn2TItWad7qzOP8A/viewform?usp=pp_url";
@@ -631,6 +656,19 @@ const CHECKIN_SESSION_ENTRY =
 
 const CHECKOUT_SESSION_ENTRY =
 "entry.432817307";
+
+
+// ==========================================
+// ẢNH - TỐI ƯU CHO IPHONE
+// ==========================================
+
+// Cạnh dài tối đa.
+// Không crop, chỉ resize giữ nguyên tỷ lệ.
+const MAX_IMAGE_SIZE = 1920;
+
+// JPEG quality.
+// 0.80 vẫn đủ rõ cho ảnh báo cáo.
+const IMAGE_QUALITY = 0.80;
 
 
 // ==========================================
@@ -872,11 +910,32 @@ async function openCamera(){
 
     try{
 
+        if(
+            !navigator.mediaDevices ||
+            !navigator.mediaDevices.getUserMedia
+        ){
+
+            throw new Error(
+                "Trình duyệt không hỗ trợ camera."
+            );
+
+        }
+
         const constraints = {
 
             video:{
                 facingMode:{
                     ideal:currentCamera
+                },
+
+                // Không ép độ phân giải quá cao.
+                // Browser/iPhone tự chọn độ phân giải phù hợp.
+                width:{
+                    ideal:1920
+                },
+
+                height:{
+                    ideal:1920
                 }
             },
 
@@ -1003,53 +1062,169 @@ function handleCapture(e){
 
     }
 
+    if(!stream){
+
+        alert(
+            "Camera chưa sẵn sàng."
+        );
+
+        return;
+
+    }
+
     const video =
         document
         .getElementById("video");
+
+    if(
+        !video.videoWidth ||
+        !video.videoHeight
+    ){
+
+        alert(
+            "Camera chưa sẵn sàng.\n\n" +
+            "Vui lòng đợi 1-2 giây rồi chụp lại."
+        );
+
+        return;
+
+    }
 
     const canvas =
         document
         .getElementById("canvas");
 
-    const width =
-        video.videoWidth ||
-        video.clientWidth ||
-        window.innerWidth;
+    let sourceWidth =
+        video.videoWidth;
 
-    const height =
-        video.videoHeight ||
-        video.clientHeight ||
-        window.innerHeight;
+    let sourceHeight =
+        video.videoHeight;
+
+
+    // ======================================
+    // GIỮ NGUYÊN TỶ LỆ
+    // ======================================
+
+    let targetWidth =
+        sourceWidth;
+
+    let targetHeight =
+        sourceHeight;
+
+
+    const longestSide =
+        Math.max(
+            sourceWidth,
+            sourceHeight
+        );
+
+
+    if(
+        longestSide >
+        MAX_IMAGE_SIZE
+    ){
+
+        const scale =
+            MAX_IMAGE_SIZE /
+            longestSide;
+
+        targetWidth =
+            Math.round(
+                sourceWidth * scale
+            );
+
+        targetHeight =
+            Math.round(
+                sourceHeight * scale
+            );
+
+    }
+
 
     canvas.width =
-        width;
+        targetWidth;
 
     canvas.height =
-        height;
+        targetHeight;
+
 
     const ctx =
-        canvas.getContext("2d");
+        canvas.getContext(
+            "2d",
+            {
+                alpha:false
+            }
+        );
+
+
+    ctx.imageSmoothingEnabled =
+        true;
+
+    ctx.imageSmoothingQuality =
+        "high";
+
 
     ctx.drawImage(
         video,
         0,
         0,
-        canvas.width,
-        canvas.height
+        targetWidth,
+        targetHeight
     );
+
+
+    // ======================================
+    // NÉN JPEG
+    // ======================================
 
     capturedImage =
         canvas.toDataURL(
             "image/jpeg",
-            0.85
+            IMAGE_QUALITY
         );
+
 
     stopCamera();
 
+
     document
-    .getElementById("previewImage")
+    .getElementById(
+        "previewImage"
+    )
     .src =
     capturedImage;
+
+
+    // ======================================
+    // HIỂN THỊ THÔNG TIN ẢNH
+    // ======================================
+
+    const approxBytes =
+        Math.round(
+            (capturedImage.length * 3) / 4
+        );
+
+    const approxMB =
+        (
+            approxBytes /
+            1024 /
+            1024
+        ).toFixed(2);
+
+
+    document
+    .getElementById(
+        "photoInfo"
+    )
+    .textContent =
+        "Ảnh đã tối ưu: " +
+        targetWidth +
+        " × " +
+        targetHeight +
+        " px • khoảng " +
+        approxMB +
+        " MB";
+
 
     showPage(
         "previewPage",
@@ -1120,6 +1295,18 @@ document
 document
 .getElementById("btnRetake")
 .onclick = ()=>{
+
+    if(!sessionId){
+
+        alert(
+            "Không tìm thấy Session ID."
+        );
+
+        return;
+
+    }
+
+    capturedImage = "";
 
     openCamera();
 
@@ -1333,10 +1520,44 @@ function openReportWithSession(){
 
 async function uploadImage(){
 
+    if(isUploading){
+
+        return;
+
+    }
+
+    isUploading = true;
+
+
+    const uploadButton =
+        document.getElementById(
+            "btnUpload"
+        );
+
+
     try{
+
+        if(!capturedImage){
+
+            throw new Error(
+                "Không có ảnh để lưu."
+            );
+
+        }
+
+
+        if(!sessionId){
+
+            throw new Error(
+                "Không tìm thấy Session ID."
+            );
+
+        }
+
 
         const info =
             getDeviceInfo();
+
 
         const payload = {
 
@@ -1361,6 +1582,10 @@ async function uploadImage(){
         };
 
 
+        uploadButton.disabled =
+            true;
+
+
         const response =
             await fetch(
                 SCRIPT_URL,
@@ -1380,10 +1605,6 @@ async function uploadImage(){
             );
 
 
-        const result =
-            await response.json();
-
-
         if(!response.ok){
 
             throw new Error(
@@ -1394,7 +1615,14 @@ async function uploadImage(){
         }
 
 
-        if(result.success === true){
+        const result =
+            await response.json();
+
+
+        if(
+            result &&
+            result.success === true
+        ){
 
             // ==================================
             // CHECK-IN
@@ -1407,22 +1635,15 @@ async function uploadImage(){
 
                 if(!sessionId){
 
-                    alert(
-                        "Không tìm thấy Session ID."
+                    throw new Error(
+                        "Session ID bị mất sau khi lưu ảnh."
                     );
-
-                    showPage(
-                        "previewPage",
-                        currentMode
-                    );
-
-                    return;
 
                 }
 
-                // Check-in:
-                // Lưu ảnh xong -> mở Form
-                // -> tự điền Session ID
+
+                // Chỉ chuyển sang Form
+                // SAU KHI Apps Script trả success.
 
                 openReportWithSession();
 
@@ -1447,6 +1668,7 @@ async function uploadImage(){
                 .textContent =
                     "Ảnh Check-out đã được lưu thành công. Bạn có thể tiếp tục làm báo cáo hoặc kết thúc.";
 
+
                 showPage(
                     "finishPage",
                     "CHECKOUT"
@@ -1459,41 +1681,57 @@ async function uploadImage(){
         }
 
 
-        else{
+        // ======================================
+        // SERVER TRẢ SUCCESS = FALSE
+        // ======================================
 
-            alert(
-                "Lưu ảnh thất bại: " +
-                (
-                    result.error ||
-                    "Không rõ nguyên nhân"
-                )
-            );
+        const serverError =
+            result &&
+            result.error
+            ? result.error
+            : "Không rõ nguyên nhân";
 
-            showPage(
-                "previewPage",
-                currentMode
-            );
 
-        }
+        throw new Error(
+            serverError
+        );
 
     }
 
     catch(error){
 
-        console.log(
+        console.error(
             "UPLOAD ERROR:",
             error
         );
 
+
+        // QUAN TRỌNG:
+        // Không xóa sessionId.
+        // Người dùng có thể chụp lại.
+
         alert(
-            "Có lỗi khi upload ảnh.\n\n" +
-            error.message
+            "❌ LƯU ẢNH THẤT BẠI\n\n" +
+            "Ảnh chưa được lưu vào hệ thống.\n" +
+            "Vui lòng chụp lại ảnh rồi thử lưu lại.\n\n" +
+            "Session ID vẫn được giữ nguyên."
         );
+
 
         showPage(
             "previewPage",
             currentMode
         );
+
+    }
+
+    finally{
+
+        isUploading =
+            false;
+
+        uploadButton.disabled =
+            false;
 
     }
 
@@ -1507,6 +1745,12 @@ async function uploadImage(){
 document
 .getElementById("btnUpload")
 .onclick = ()=>{
+
+    if(isUploading){
+
+        return;
+
+    }
 
     if(!capturedImage){
 
@@ -1553,6 +1797,16 @@ document
 
     }
 
+    if(!sessionId){
+
+        alert(
+            "Không tìm thấy Session ID."
+        );
+
+        return;
+
+    }
+
     openReportWithSession();
 
 };
@@ -1571,6 +1825,16 @@ document
         currentMode !==
         "CHECKOUT"
     ){
+
+        return;
+
+    }
+
+    if(!sessionId){
+
+        alert(
+            "Không tìm thấy Session ID."
+        );
 
         return;
 
@@ -1688,6 +1952,7 @@ document
     capturedImage = "";
     sessionId = "";
     currentMode = "";
+    isUploading = false;
 
     document
     .getElementById(
