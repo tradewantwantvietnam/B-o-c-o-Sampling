@@ -1,400 +1,618 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sampling 2026</title>
-    <style>
-    /* ==========================
-        RESET & MOBILE VIEWPORT FIX
-    ========================== */
-    *{
-        margin:0;
-        padding:0;
-        box-sizing:border-box;
-        -webkit-tap-highlight-color:transparent;
-    }
-    html,
-    body{
-        width:100%;
-        height:100%;
-        background:#f6f6f6;
-        overflow:hidden;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        font-size: 16px;
-    }
-    /* ==========================
-        PAGE
-    ========================== */
-    #app{
-        width:100%;
-        height:100%;
-        position:relative;
-    }
-    .page{
-        position:absolute;
-        inset:0;
-        display:none;
-        align-items:center;
-        justify-content:center;
-        padding:16px;
-        background:#f6f6f6;
-        overflow-y: auto;
-    }
-    .page.active{
-        display:flex;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    /* THEME BACKGROUNDS */
-    .page-checkout {
-        background: #2a2f35;
-    }
+<title>Sampling 2026</title>
 
-    /* ==========================
-        CARD (Responsive Mobile)
-    ========================== */
-    .card{
-        width:100%;
-        max-width:480px;
-        background:white;
-        border-radius:20px;
-        padding:24px 20px;
-        box-shadow: 0 8px 24px rgba(0,0,0,.08);
-        margin: auto;
-    }
-    .card h1{
-        text-align:center;
-        font-size:26px;
-        margin-bottom:8px;
-        color:#222;
-    }
-    .card h2{
-        text-align:center;
-        font-size:22px;
-        margin-bottom:16px;
-        color:#222;
-    }
-    .subtitle{
-        text-align:center;
-        color:#666;
-        font-size:15px;
-        margin-bottom:20px;
-    }
-    /* ==========================
-        INPUT & SELECT
-    ========================== */
-    label{
-        display:block;
-        margin-top:12px;
-        margin-bottom:6px;
-        font-size:15px;
-        font-weight:600;
-        color:#444;
-    }
-    input,
-    select{
-        width:100%;
-        height:50px;
-        border-radius:12px;
-        border:1px solid #ccc;
-        padding:0 14px;
-        font-size:16px;
-        outline:none;
-        background:white;
-    }
-    input:focus,
-    select:focus{
-        border-color:#ff6b00;
-    }
-    /* ==========================
-        BUTTON
-    ========================== */
-    button{
-        width:100%;
-        height:52px;
-        margin-top:14px;
-        border:none;
-        border-radius:14px;
-        background:#ff6b00;
-        color:white;
-        font-size:17px;
-        font-weight:700;
-        cursor:pointer;
-        transition:.2s;
-        -webkit-appearance: none;
-    }
-    button:active{
-        transform:scale(.97);
-    }
-    button:disabled{
-        opacity:.5;
-    }
-    .btnBack{
-        background:#9e9e9e;
-    }
-    /* ==========================
-        CAMERA
-    ========================== */
-    .camera-page{
-        background:black;
-        padding:0;
-    }
-    #video{
-        width:100vw;
-        height:100vh;
-        object-fit:cover;
-        background:black;
-    }
-    #preview{
-        display:none;
-        width:100vw;
-        height:100vh;
-        object-fit:contain;
-        background:black;
-    }
-    
-    .cameraGuideBanner {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.65);
-        color: #ffeb3b;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 600;
-        z-index: 101;
-        text-align: center;
-        border: 1px solid rgba(255, 235, 59, 0.4);
-        pointer-events: none;
-    }
+<style>
 
-    .cameraToolbar{
-        position:fixed;
-        left:0;
-        right:0;
-        bottom:24px;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        gap:16px;
-        z-index:100;
-    }
-    .cameraToolbar button{
-        width:64px;
-        height:64px;
-        border-radius:50%;
-        margin:0;
-        font-size:26px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-    }
-    #btnCapture{
-        width:80px;
-        height:80px;
-        font-size:32px;
-        background: #fff;
-        color: #000;
-        border: 4px solid #ff6b00;
-    }
-    /* ==========================
-        PREVIEW
-    ========================== */
-    #previewImage{
-        width:100%;
-        max-height:50vh;
-        object-fit:contain;
-        border-radius:14px;
-        margin-bottom:14px;
-    }
-    /* ==========================
-        LOADER
-    ========================== */
-    .loader{
-        width:60px;
-        height:60px;
-        border-radius:50%;
-        border:5px solid #ddd;
-        border-top-color:#ff6b00;
-        margin:20px auto;
-        animation:spin .8s linear infinite;
-    }
-    @keyframes spin{
-        from{ transform:rotate(0deg); }
-        to{ transform:rotate(360deg); }
-    }
-    @supports(padding:max(0px)){
-    .cameraToolbar{
-        padding-bottom:max(16px,env(safe-area-inset-bottom));
-    }
-    .cameraGuideBanner {
-        top: max(20px, env(safe-area-inset-top));
-    }
-    }
-    video{
-        transform:scaleX(1);
-        -webkit-transform:scaleX(1);
-    }
-    body{
-        overscroll-behavior:none;
-    }
-    .page{
-        animation:fade .2s;
-    }
-    @keyframes fade{
-        from{
-            opacity:0;
-            transform:translateY(8px);
-        }
-        to{
-            opacity:1;
-            transform:none;
-        }
-    }
-    </style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    background:#f6f6f6;
+    overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    font-size:16px;
+}
+
+#app{
+    width:100%;
+    height:100%;
+    position:relative;
+}
+
+.page{
+    position:absolute;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+    background:#f6f6f6;
+    overflow-y:auto;
+}
+
+.page.active{
+    display:flex;
+}
+
+.page-checkout{
+    background:#2a2f35;
+}
+
+.card{
+    width:100%;
+    max-width:480px;
+    background:white;
+    border-radius:20px;
+    padding:24px 20px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+    margin:auto;
+}
+
+.card h1{
+    text-align:center;
+    font-size:26px;
+    margin-bottom:8px;
+    color:#222;
+}
+
+.card h2{
+    text-align:center;
+    font-size:22px;
+    margin-bottom:16px;
+    color:#222;
+}
+
+.subtitle{
+    text-align:center;
+    color:#666;
+    font-size:15px;
+    margin-bottom:20px;
+}
+
+button{
+    width:100%;
+    height:52px;
+    margin-top:14px;
+    border:none;
+    border-radius:14px;
+    background:#ff6b00;
+    color:white;
+    font-size:17px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+    -webkit-appearance:none;
+}
+
+button:active{
+    transform:scale(.97);
+}
+
+button:disabled{
+    opacity:.5;
+}
+
+.btnBack{
+    background:#9e9e9e;
+}
+
+.btnCheckin{
+    background:#e1ecfd;
+    color:#1d4ed8;
+}
+
+.btnCheckout{
+    background:#3c444c;
+    color:white;
+}
+
+.btnActionTheme{
+    background:#414952;
+    color:white;
+}
+
+.btnCopy{
+    background:#16a34a;
+    color:white;
+}
+
+.sessionBox{
+    margin-top:16px;
+    padding:14px;
+    border-radius:12px;
+    background:#f3f4f6;
+    border:1px solid #ddd;
+}
+
+.sessionLabel{
+    font-size:14px;
+    font-weight:600;
+    color:#666;
+    margin-bottom:6px;
+}
+
+.sessionValue{
+    font-size:17px;
+    font-weight:700;
+    color:#111;
+    word-break:break-all;
+    text-align:center;
+}
+
+.camera-page{
+    background:black;
+    padding:0;
+}
+
+#video{
+    width:100vw;
+    height:100vh;
+    object-fit:cover;
+    background:black;
+}
+
+#preview{
+    display:none;
+    width:100vw;
+    height:100vh;
+    object-fit:contain;
+    background:black;
+}
+
+.cameraGuideBanner{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,.65);
+    color:#ffeb3b;
+    padding:8px 16px;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:600;
+    z-index:101;
+    text-align:center;
+    border:1px solid rgba(255,235,59,.4);
+    pointer-events:none;
+}
+
+.cameraToolbar{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:24px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:16px;
+    z-index:100;
+}
+
+.cameraToolbar button{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    margin:0;
+    font-size:26px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+#btnCapture{
+    width:80px;
+    height:80px;
+    font-size:32px;
+    background:#fff;
+    color:#000;
+    border:4px solid #ff6b00;
+}
+
+#previewImage{
+    width:100%;
+    max-height:50vh;
+    object-fit:contain;
+    border-radius:14px;
+    margin-bottom:14px;
+}
+
+.loader{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    border:5px solid #ddd;
+    border-top-color:#ff6b00;
+    margin:20px auto;
+    animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+
+@supports(padding:max(0px)){
+
+.cameraToolbar{
+    padding-bottom:max(16px,env(safe-area-inset-bottom));
+}
+
+.cameraGuideBanner{
+    top:max(20px,env(safe-area-inset-top));
+}
+
+}
+
+video{
+    transform:scaleX(1);
+    -webkit-transform:scaleX(1);
+}
+
+body{
+    overscroll-behavior:none;
+}
+
+.page{
+    animation:fade .2s;
+}
+
+@keyframes fade{
+
+from{
+    opacity:0;
+    transform:translateY(8px);
+}
+
+to{
+    opacity:1;
+    transform:none;
+}
+
+}
+
+</style>
 </head>
+
 <body>
+
 <div id="app">
-    <!-- ================= HOME ================= -->
-    <section id="homePage" class="page active">
-        <div class="card">
-            <h1>📸 Sampling 2026</h1>
-            <p class="subtitle">
-                Hệ thống Check-in / Check-out Sampling
-            </p>
-            <button id="btnHomeCheckIn" style="background: #e1ecfd; color: #1d4ed8;">
-                ☀️ Check-in
-            </button>
-            <button id="btnHomeCheckOut" style="background: #3c444c;">
-                🌙 Check-out
-            </button>
-        </div>
-    </section>
 
-    <!-- ================= STORE ================= -->
-    <section id="storePage" class="page">
-        <div class="card">
-            <h2 id="storeTitle">
-            </h2>
-            <label>
-                Mã điểm bán
-            <div id="storeCodeGroup">
-    <label>Mã điểm bán</label>
-    <input
-        id="storeCode"
-        type="text"
-        autocomplete="off"
-        style="text-transform: uppercase;"
-        placeholder="Ví dụ: TNI007701"
-    >
+<!-- ================= HOME ================= -->
+
+<section id="homePage" class="page active">
+
+<div class="card">
+
+<h1>📸 Sampling 2026</h1>
+
+<p class="subtitle">
+Hệ thống Check-in / Check-out Sampling
+</p>
+
+<button
+id="btnHomeCheckIn"
+class="btnCheckin">
+☀️ Check-in
+</button>
+
+<button
+id="btnHomeCheckOut"
+class="btnCheckout">
+🌙 Check-out
+</button>
+
 </div>
-            
-            <!-- Trường chọn ngày làm / Lịch làm -->
-            <div id="reportDateGroup">
-                <label>Chọn lịch làm / Ngày báo cáo</label>
-                <input
-                    id="reportDate"
-                    type="date"
-                >
-            </div>
 
-            <label>
-                Chọn Camera
-            </label>
-            <select id="cameraSelect">
-                <option value="environment">
-                    📷 Camera sau
-                </option>
-                <option value="user">
-                    🤳 Camera trước
-                </option>
-            </select>
-            <button id="btnOpenCamera" class="btnActionTheme" type="button">
-                Tiếp tục
-            </button>
-            <button class="btnBack" type="button">
-                ⬅ Quay lại
-            </button>
-        </div>
-    </section>
-    <!-- ================= CAMERA ================= -->
-    <section id="cameraPage" class="page camera-page">
-        <div class="cameraGuideBanner">📷 Đang ở chế độ CHỤP ẢNH (Bấm nút tròn để chụp)</div>
+</section>
 
-        <video
-            id="video"
-            autoplay
-            playsinline
-            muted
-        ></video>
-        <canvas
-            id="canvas"
-            style="display:none"
-        ></canvas>
-        <img
-            id="preview"
-        >
-        <div class="cameraToolbar">
-            <button id="btnSwitchCamera" title="Đổi camera" type="button">
-                🔄
-            </button>
-            <button id="btnCapture" title="Chụp ảnh" type="button">
-                📸
-            </button>
-            <button id="btnCancelCamera" title="Hủy" type="button">
-                ❌
-            </button>
-        </div>
-    </section>
-    <!-- ================= PREVIEW ================= -->
-    <section id="previewPage" class="page">
-        <div class="card">
-            <h2>
-                Xem lại ảnh
-            </h2>
-            <img id="previewImage">
-            <button id="btnRetake" type="button">
-                🔄 Chụp lại
-            </button>
-            <button id="btnUpload" class="btnActionTheme" type="button">
-                ⬆ Lưu ảnh
-            </button>
-        </div>
-    </section>
-    <!-- ================= FINISH ================= -->
-    <section id="finishPage" class="page">
-        <div class="card">
-            <h2>
-                ✅ Ảnh đã lưu
-            </h2>
-            <button id="btnFinish" class="btnActionTheme" type="button">
-                ✔ Lưu hình và kết thúc
-            </button>
-            <button id="btnContinueReport" type="button">
-                📝 Lưu hình và tiếp tục báo cáo
-            </button>
-        </div>
-    </section>
-    <!-- ================= LOADING ================= -->
-    <section id="loadingPage" class="page">
-        <div class="card">
-            <h2>
-                Đang lưu ảnh...
-            </h2>
-            <div class="loader"></div>
-            <p style="text-align:center; color:#666;">
-                Vui lòng không đóng trình duyệt
-            </p>
-        </div>
-    </section>
+
+<!-- ================= CHECKOUT CHOICE ================= -->
+
+<section id="checkoutChoicePage" class="page">
+
+<div class="card">
+
+<h2>🌙 Check-out</h2>
+
+<p class="subtitle">
+Chọn hình thức thực hiện
+</p>
+
+<button
+id="btnCheckoutPhoto"
+class="btnActionTheme">
+📷 Chụp ảnh Check-out
+</button>
+
+<button
+id="btnCheckoutReport"
+class="btnActionTheme">
+📝 Làm báo cáo Check-out
+</button>
+
+<button
+id="btnCheckoutBack"
+class="btnBack">
+⬅ Quay lại
+</button>
+
 </div>
+
+</section>
+
+
+<!-- ================= CAMERA SETTING ================= -->
+
+<section id="cameraSettingPage" class="page">
+
+<div class="card">
+
+<h2 id="cameraSettingTitle"></h2>
+
+<label>
+Chọn Camera
+</label>
+
+<select id="cameraSelect">
+
+<option value="environment">
+📷 Camera sau
+</option>
+
+<option value="user">
+🤳 Camera trước
+</option>
+
+</select>
+
+<button
+id="btnOpenCamera"
+class="btnActionTheme"
+type="button">
+
+Tiếp tục
+
+</button>
+
+<button
+id="btnCameraSettingBack"
+class="btnBack"
+type="button">
+
+⬅ Quay lại
+
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ================= CAMERA ================= -->
+
+<section id="cameraPage" class="page camera-page">
+
+<div class="cameraGuideBanner">
+📷 Đang ở chế độ CHỤP ẢNH (Bấm nút tròn để chụp)
+</div>
+
+<video
+id="video"
+autoplay
+playsinline
+muted>
+</video>
+
+<canvas
+id="canvas"
+style="display:none">
+</canvas>
+
+<img
+id="preview">
+
+<div class="cameraToolbar">
+
+<button
+id="btnSwitchCamera"
+title="Đổi camera"
+type="button">
+🔄
+</button>
+
+<button
+id="btnCapture"
+title="Chụp ảnh"
+type="button">
+📸
+</button>
+
+<button
+id="btnCancelCamera"
+title="Hủy"
+type="button">
+❌
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ================= PREVIEW ================= -->
+
+<section id="previewPage" class="page">
+
+<div class="card">
+
+<h2>
+Xem lại ảnh
+</h2>
+
+<img
+id="previewImage">
+
+<button
+id="btnRetake"
+type="button">
+🔄 Chụp lại
+</button>
+
+<button
+id="btnUpload"
+class="btnActionTheme"
+type="button">
+⬆ Lưu ảnh
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ================= FINISH ================= -->
+
+<section id="finishPage" class="page">
+
+<div class="card">
+
+<h2>
+✅ Ảnh đã lưu
+</h2>
+
+<p
+id="finishDescription"
+class="subtitle">
+</p>
+
+<div
+id="sessionBox"
+class="sessionBox">
+
+<div class="sessionLabel">
+Session ID
+</div>
+
+<div
+id="sessionValue"
+class="sessionValue">
+</div>
+
+</div>
+
+<button
+id="btnCopySession"
+class="btnCopy"
+type="button">
+📋 Copy Session ID
+</button>
+
+<button
+id="btnContinueReport"
+class="btnActionTheme"
+type="button">
+📝 Lưu hình và tiếp tục báo cáo
+</button>
+
+<button
+id="btnFinish"
+class="btnBack"
+type="button">
+✔ Kết thúc
+</button>
+
+</div>
+
+</section>
+
+
+<!-- ================= LOADING ================= -->
+
+<section id="loadingPage" class="page">
+
+<div class="card">
+
+<h2>
+Đang lưu ảnh...
+</h2>
+
+<div class="loader"></div>
+
+<p style="text-align:center;color:#666;">
+Vui lòng không đóng trình duyệt
+</p>
+
+</div>
+
+</section>
+
+</div>
+
 
 <script>
-let currentMode = "";
 
-function showPage(id, mode = ""){
+let currentMode = "";
+let stream = null;
+let currentCamera = "environment";
+let capturedImage = "";
+let sessionId = "";
+
+
+// ==========================================
+// URL
+// ==========================================
+
+const SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbzQa4AAsZU9gPnvU9z8z0F9dl6cP38ALx_yhwPqLUdMu9SQatQyiHDoQuYh0d823uhJ/exec";
+
+const CHECKIN_FORM =
+"https://docs.google.com/forms/d/e/1FAIpQLSchaY-0UJIstKxnNRIDgE-bx7VAiDP1DLWn2TItWad7qzOP8A/formResponse?usp=pp_url";
+
+const CHECKOUT_FORM =
+"https://docs.google.com/forms/d/e/1FAIpQLSe-f946yjSe9lr6iVp4kzvzGHGlHxHzg-uhOyJpzuleh-raLQ/viewform?usp=dialog";
+
+
+// ==========================================
+// TẠO SESSION ID
+// ==========================================
+
+function createSessionId(){
+
+    const now = new Date();
+
+    const timePart =
+        now.getFullYear().toString() +
+        String(now.getMonth()+1).padStart(2,"0") +
+        String(now.getDate()).padStart(2,"0") +
+        String(now.getHours()).padStart(2,"0") +
+        String(now.getMinutes()).padStart(2,"0") +
+        String(now.getSeconds()).padStart(2,"0");
+
+    const randomPart =
+        Math.floor(Math.random()*9000+1000);
+
+    return "SMP-" + timePart + "-" + randomPart;
+}
+
+
+// ==========================================
+// SHOW PAGE
+// ==========================================
+
+function showPage(id, mode=""){
+
     document
         .querySelectorAll(".page")
         .forEach(p=>{
@@ -402,380 +620,930 @@ function showPage(id, mode = ""){
             p.classList.remove("page-checkout");
         });
 
-    let targetPage = document.getElementById(id);
-    targetPage.classList.add("active");
+    const target =
+        document.getElementById(id);
 
-    let activeMode = mode || currentMode;
-    if(id === "storePage" || id === "previewPage" || id === "finishPage"){
+    target.classList.add("active");
+
+    const activeMode =
+        mode || currentMode;
+
+    if(
+        id === "checkoutChoicePage" ||
+        id === "cameraSettingPage" ||
+        id === "previewPage" ||
+        id === "finishPage"
+    ){
+
         if(activeMode === "CHECKOUT"){
-            targetPage.classList.add("page-checkout");
+            target.classList.add("page-checkout");
         }
+
     }
 
-    let actionButtons = targetPage.querySelectorAll(".btnActionTheme");
-    actionButtons.forEach(btn => {
+    const buttons =
+        target.querySelectorAll(".btnActionTheme");
+
+    buttons.forEach(btn=>{
+
         if(activeMode === "CHECKIN"){
-            btn.style.background = "#3b82f6";
-            btn.style.color = "#ffffff";
-        } else if(activeMode === "CHECKOUT"){
-            btn.style.background = "#414952";
-            btn.style.color = "#ffffff";
+
+            btn.style.background="#3b82f6";
+            btn.style.color="#fff";
+
         }
+
+        if(activeMode === "CHECKOUT"){
+
+            btn.style.background="#414952";
+            btn.style.color="#fff";
+
+        }
+
     });
+
 }
 
-// Xử lý sự kiện từ màn hình chính chuyển sang Check-in
-document.getElementById("btnHomeCheckIn").onclick = ()=>{
+
+// ==========================================
+// CHECK-IN
+// ==========================================
+
+document
+.getElementById("btnHomeCheckIn")
+.onclick = ()=>{
+
     currentMode = "CHECKIN";
 
-    const now = new Date();
-    const timePart =
-        now.getFullYear().toString() +
-        String(now.getMonth() + 1).padStart(2, "0") +
-        String(now.getDate()).padStart(2, "0") +
-        String(now.getHours()).padStart(2, "0") +
-        String(now.getMinutes()).padStart(2, "0") +
-        String(now.getSeconds()).padStart(2, "0");
+    sessionId =
+        createSessionId();
 
-    const randomPart = Math.floor(Math.random() * 9000 + 1000);
+    document
+        .getElementById("cameraSettingTitle")
+        .innerHTML =
+        "☀️ Check-in";
 
-    sessionId = "SMP-" + timePart + "-" + randomPart;
+    showPage(
+        "cameraSettingPage",
+        "CHECKIN"
+    );
 
-    storeCodeValue = "";
-    reportDateValue = "";
-
-    document.getElementById("storeCodeGroup").style.display = "none"; 
-    document.getElementById("reportDateGroup").style.display = "none";
-    document.getElementById("storeTitle").innerHTML = "☀️ Check-in";
-
-    showPage("storePage", "CHECKIN");
 };
 
-// Xử lý sự kiện từ màn hình chính chuyển sang Check-out
-document.getElementById("btnHomeCheckOut").onclick = ()=>{
+
+// ==========================================
+// CHECK-OUT
+// ==========================================
+
+document
+.getElementById("btnHomeCheckOut")
+.onclick = ()=>{
+
     currentMode = "CHECKOUT";
 
-    document.getElementById("storeCodeGroup").style.display = "block";
-    document.getElementById("reportDateGroup").style.display = "block";
-    document.getElementById("storeTitle").innerHTML = "🌙 Check-out";
+    sessionId = "";
 
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById("reportDate").value = today;
+    showPage(
+        "checkoutChoicePage",
+        "CHECKOUT"
+    );
 
-    showPage("storePage", "CHECKOUT");
 };
 
-document.querySelectorAll(".btnBack").forEach(btn=>{
-    btn.onclick=()=>{
-        if(document.getElementById("storePage").classList.contains("active")){
-            showPage("homePage");
-            return;
-        }
-    };
-});
-
-// Auto uppercase storeCode and restrict
-document.getElementById("storeCode").addEventListener("input", function (e) {
-    let start = this.selectionStart;
-    let end = this.selectionEnd;
-    this.value = this.value.toUpperCase();
-    this.setSelectionRange(start, end);
-});
-
-let stream = null;
-let currentCamera = "environment";
-let capturedImage = "";
-let storeCodeValue = "";
-let reportDateValue = "";
-let sessionId = "";
 
 // ==========================================
-// GÁN SỰ KIỆN NÚT TIẾP TỤC (MỞ CAMERA)
+// CHECK-OUT: CHỤP ẢNH
 // ==========================================
-let btnOpenCam = document.getElementById("btnOpenCamera");
-function handleOpenCameraButton(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
+
+document
+.getElementById("btnCheckoutPhoto")
+.onclick = ()=>{
+
+    currentMode = "CHECKOUT";
+
+    sessionId =
+        createSessionId();
+
+    document
+        .getElementById("cameraSettingTitle")
+        .innerHTML =
+        "🌙 Chụp ảnh Check-out";
+
+    showPage(
+        "cameraSettingPage",
+        "CHECKOUT"
+    );
+
+};
+
+
+// ==========================================
+// CHECK-OUT: LÀM BÁO CÁO
+// ==========================================
+
+document
+.getElementById("btnCheckoutReport")
+.onclick = ()=>{
+
+    currentMode = "CHECKOUT";
+
+    sessionId = "";
+
+    window.location.href =
+        CHECKOUT_FORM;
+
+};
+
+
+// ==========================================
+// BACK
+// ==========================================
+
+document
+.getElementById("btnCheckoutBack")
+.onclick = ()=>{
+
+    showPage("homePage");
+
+};
+
+document
+.getElementById("btnCameraSettingBack")
+.onclick = ()=>{
+
+    if(currentMode === "CHECKIN"){
+
+        showPage(
+            "homePage"
+        );
+
+    }else{
+
+        showPage(
+            "checkoutChoicePage",
+            "CHECKOUT"
+        );
+
     }
 
-    if (currentMode === "CHECKIN") {
-        currentCamera = document.getElementById("cameraSelect").value;
-        openCamera();
-        return;
-    }
+};
 
-    const code = document.getElementById("storeCode").value.trim().toUpperCase();
-    const rDate = document.getElementById("reportDate").value;
 
-    if (code === "") {
-        alert("Vui lòng nhập mã điểm bán");
-        document.getElementById("storeCode").focus();
-        return;
-    }
+// ==========================================
+// OPEN CAMERA
+// ==========================================
 
-    const storeCodeRegex = /^[A-Z]{3}[0-9]{3,6}$/;
-    if (!storeCodeRegex.test(code)) {
-        alert("Mã điểm bán không đúng định dạng chuẩn!\n(Ví dụ mẫu đúng: TNI007701)");
-        document.getElementById("storeCode").focus();
-        return;
-    }
+document
+.getElementById("btnOpenCamera")
+.onclick = ()=>{
 
-    if (!rDate) {
-        alert("Vui lòng chọn lịch làm / ngày báo cáo");
-        document.getElementById("reportDate").focus();
-        return;
-    }
-
-    storeCodeValue = code;
-    reportDateValue = rDate;
-    currentCamera = document.getElementById("cameraSelect").value;
+    currentCamera =
+        document
+        .getElementById("cameraSelect")
+        .value;
 
     openCamera();
-}
 
-btnOpenCam.onclick = handleOpenCameraButton;
-btnOpenCam.ontouchend = (e) => {
-    e.preventDefault();
-    handleOpenCameraButton(e);
 };
 
-async function openCamera() {
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+
+async function openCamera(){
+
+    if(stream){
+
+        stream
+        .getTracks()
+        .forEach(track=>track.stop());
+
         stream = null;
+
     }
 
-    try {
+    try{
+
         const constraints = {
-            video: {
-                facingMode: { ideal: currentCamera }
+
+            video:{
+                facingMode:{
+                    ideal:currentCamera
+                }
             },
-            audio: false
+
+            audio:false
+
         };
 
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-        let videoElement = document.getElementById("video");
-        videoElement.srcObject = stream;
-        
-        showPage("cameraPage", currentMode);
+        stream =
+            await navigator
+            .mediaDevices
+            .getUserMedia(
+                constraints
+            );
 
-        await videoElement.play().catch(e => console.log("Video play error:", e));
+        const video =
+            document
+            .getElementById("video");
+
+        video.srcObject =
+            stream;
+
+        showPage(
+            "cameraPage",
+            currentMode
+        );
+
+        await video
+            .play()
+            .catch(()=>{});
+
     }
-    catch (error) {
-        console.error("CAMERA ERROR:", error);
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
+
+    catch(error){
+
+        console.error(
+            "CAMERA ERROR:",
+            error
+        );
+
+        if(stream){
+
+            stream
+            .getTracks()
+            .forEach(track=>track.stop());
+
             stream = null;
+
         }
-        showPage("storePage", currentMode);
-        
-        let message = "Không mở được camera.\n\n";
-        if (error.name === "NotAllowedError") {
-            message += "❌ Trình duyệt đang CHẶN quyền Camera.\n\n" + "Hãy cho phép Camera rồi thử lại.";
-        } else if (error.name === "NotFoundError") {
-            message += "❌ Không tìm thấy camera trên thiết bị.";
-        } else {
-            message += "❌ Lỗi: " + error.name + "\n\n" + error.message;
+
+        showPage(
+            "cameraSettingPage",
+            currentMode
+        );
+
+        let message =
+            "Không mở được camera.\n\n";
+
+        if(
+            error.name ===
+            "NotAllowedError"
+        ){
+
+            message +=
+            "❌ Trình duyệt đang CHẶN quyền Camera.\n\n" +
+            "Hãy cho phép Camera rồi thử lại.";
+
         }
+
+        else if(
+            error.name ===
+            "NotFoundError"
+        ){
+
+            message +=
+            "❌ Không tìm thấy camera trên thiết bị.";
+
+        }
+
+        else{
+
+            message +=
+            "❌ Lỗi: " +
+            error.name +
+            "\n\n" +
+            error.message;
+
+        }
+
         alert(message);
+
     }
+
 }
 
-document.getElementById("btnSwitchCamera").onclick = ()=>{
-    currentCamera = (currentCamera === "environment") ? "user" : "environment";
-    openCamera();
-};
 
 // ==========================================
-// XỬ LÝ CHỤP ẢNH
+// SWITCH CAMERA
 // ==========================================
-function handleCapture(e) {
-    if(e) {
+
+document
+.getElementById("btnSwitchCamera")
+.onclick = ()=>{
+
+    currentCamera =
+        currentCamera === "environment"
+        ? "user"
+        : "environment";
+
+    openCamera();
+
+};
+
+
+// ==========================================
+// CAPTURE
+// ==========================================
+
+function handleCapture(e){
+
+    if(e){
+
         e.preventDefault();
         e.stopPropagation();
+
     }
-    
-    let video = document.getElementById("video");
-    let canvas = document.getElementById("canvas");
-    
-    let width = video.videoWidth || video.clientWidth || window.innerWidth;
-    let height = video.videoHeight || video.clientHeight || window.innerHeight;
-    
-    canvas.width = width;
-    canvas.height = height;
-    
-    let ctx = canvas.getContext("2d");
-    try {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    } catch(err) {
-        console.log("Canvas drawImage error:", err);
-    }
-    
-    capturedImage = canvas.toDataURL("image/jpeg", 0.85);
-    
+
+    const video =
+        document
+        .getElementById("video");
+
+    const canvas =
+        document
+        .getElementById("canvas");
+
+    const width =
+        video.videoWidth ||
+        video.clientWidth ||
+        window.innerWidth;
+
+    const height =
+        video.videoHeight ||
+        video.clientHeight ||
+        window.innerHeight;
+
+    canvas.width =
+        width;
+
+    canvas.height =
+        height;
+
+    const ctx =
+        canvas.getContext("2d");
+
+    ctx.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    capturedImage =
+        canvas.toDataURL(
+            "image/jpeg",
+            0.85
+        );
+
     stopCamera();
-    
-    document.getElementById("previewImage").src = capturedImage;
-    showPage("previewPage", currentMode);
+
+    document
+    .getElementById("previewImage")
+    .src =
+    capturedImage;
+
+    showPage(
+        "previewPage",
+        currentMode
+    );
+
 }
 
-let captureBtn = document.getElementById("btnCapture");
-captureBtn.onclick = handleCapture;
-captureBtn.ontouchend = (e) => {
-    e.preventDefault();
-    handleCapture(e);
-};
+
+document
+.getElementById("btnCapture")
+.onclick =
+handleCapture;
+
+
+// ==========================================
+// STOP CAMERA
+// ==========================================
 
 function stopCamera(){
+
     if(stream){
-        stream.getTracks().forEach(track=>track.stop());
+
+        stream
+        .getTracks()
+        .forEach(track=>track.stop());
+
         stream = null;
+
     }
+
 }
 
-document.getElementById("btnCancelCamera").onclick = ()=>{
+
+// ==========================================
+// CANCEL CAMERA
+// ==========================================
+
+document
+.getElementById("btnCancelCamera")
+.onclick = ()=>{
+
     stopCamera();
-    showPage("storePage", currentMode);
+
+    if(currentMode === "CHECKIN"){
+
+        showPage(
+            "cameraSettingPage",
+            "CHECKIN"
+        );
+
+    }else{
+
+        showPage(
+            "cameraSettingPage",
+            "CHECKOUT"
+        );
+
+    }
+
 };
 
-document.getElementById("btnRetake").onclick = ()=>{
+
+// ==========================================
+// RETAKE
+// ==========================================
+
+document
+.getElementById("btnRetake")
+.onclick = ()=>{
+
     openCamera();
+
 };
 
-document.getElementById("btnUpload").onclick = ()=>{
-    showPage("loadingPage");
-    uploadImage();
-};
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzQa4AAsZU9gPnvU9z8z0F9dl6cP38ALx_yhwPqLUdMu9SQatQyiHDoQuYh0d823uhJ/exec";
-const CHECKIN_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSchaY-0UJIstKxnNRIDgE-bx7VAiDP1DLWn2TItWad7qzOP8A/formResponse?usp=pp_url";
-const CHECKOUT_FORM = "https://docs.google.com/forms/d/e/1FAIpQLSe-f946yjSe9lr6iVp4kzvzGHGlHxHzg-uhOyJpzuleh-raLQ/viewform?usp=dialog";
+// ==========================================
+// DEVICE INFO
+// ==========================================
 
-function getDeviceInfo() {
-    const ua = navigator.userAgent;
-    let browser = "Unknown";
-    let device = "Desktop";
-    
-    if (ua.indexOf("Firefox") > -1) {
-        browser = "Firefox";
-    } else if (ua.indexOf("SamsungBrowser") > -1) {
-        browser = "Samsung Internet";
-    } else if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) {
-        browser = "Opera";
-    } else if (ua.indexOf("Edge") > -1) {
-        browser = "Edge";
-    } else if (ua.indexOf("Edg") > -1) {
-        browser = "Chromium Edge";
-    } else if (ua.indexOf("Chrome") > -1) {
-        browser = "Chrome";
-    } else if (ua.indexOf("Safari") > -1) {
-        browser = "Safari";
+function getDeviceInfo(){
+
+    const ua =
+        navigator.userAgent;
+
+    let browser =
+        "Unknown";
+
+    let device =
+        "Desktop";
+
+    if(
+        ua.indexOf("Firefox") > -1
+    ){
+
+        browser="Firefox";
+
     }
-    if (/android/i.test(ua)) {
-        device = "Android Phone/Tablet";
-    } else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
-        device = "iOS (iPhone/iPad)";
-    } else if (/Mobile|iP(hone|od|ad)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
-        device = "Mobile Other";
-    } else {
-        device = "PC / Desktop";
+    else if(
+        ua.indexOf("SamsungBrowser") > -1
+    ){
+
+        browser="Samsung Internet";
+
     }
-    return { device, browser };
+    else if(
+        ua.indexOf("Opera") > -1 ||
+        ua.indexOf("OPR") > -1
+    ){
+
+        browser="Opera";
+
+    }
+    else if(
+        ua.indexOf("Edg") > -1
+    ){
+
+        browser="Chromium Edge";
+
+    }
+    else if(
+        ua.indexOf("Chrome") > -1
+    ){
+
+        browser="Chrome";
+
+    }
+    else if(
+        ua.indexOf("Safari") > -1
+    ){
+
+        browser="Safari";
+
+    }
+
+
+    if(
+        /android/i.test(ua)
+    ){
+
+        device =
+        "Android Phone/Tablet";
+
+    }
+
+    else if(
+        /iPad|iPhone|iPod/.test(ua) &&
+        !window.MSStream
+    ){
+
+        device =
+        "iOS (iPhone/iPad)";
+
+    }
+
+    else if(
+        /Mobile|Android|BlackBerry|IEMobile|Kindle|Silk|Opera Mini/i.test(ua)
+    ){
+
+        device =
+        "Mobile Other";
+
+    }
+
+    else{
+
+        device =
+        "PC / Desktop";
+
+    }
+
+    return{
+        device,
+        browser
+    };
+
 }
+
+
+// ==========================================
+// UPLOAD
+// ==========================================
+
 async function uploadImage(){
+
     try{
-        const info = getDeviceInfo();
-        let payload = {
-            image: capturedImage,
-            storeCode: storeCodeValue,
-            reportDate: reportDateValue,
-            sessionId: sessionId,
-            type: currentMode,
-            device: info.device,
-            browser: info.browser,
-            time: new Date().toISOString()
+
+        const info =
+            getDeviceInfo();
+
+        const payload = {
+
+            image:
+                capturedImage,
+
+            sessionId:
+                sessionId,
+
+            type:
+                currentMode,
+
+            device:
+                info.device,
+
+            browser:
+                info.browser,
+
+            time:
+                new Date().toISOString()
+
         };
-        let response = await fetch(SCRIPT_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            },
-            body: JSON.stringify(payload)
-        });
-        let result = await response.json();
+
+
+        const response =
+            await fetch(
+                SCRIPT_URL,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                        "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
         if(!response.ok){
-            throw new Error("HTTP Error: " + response.status);
+
+            throw new Error(
+                "HTTP Error: " +
+                response.status
+            );
+
         }
+
+
         if(result.success === true){
-            // ==========================================
+
+            // ==================================
             // CHECK-IN
-            // SAU KHI LƯU ẢNH -> TỰ ĐỘNG MỞ BÁO CÁO
-            // ==========================================
-            if(currentMode === "CHECKIN"){
+            // ==================================
+
+            if(
+                currentMode ===
+                "CHECKIN"
+            ){
 
                 if(!sessionId){
+
                     alert(
-                        "Không tìm thấy Session ID. " +
-                        "Vui lòng thực hiện lại Check-in."
+                        "Không tìm thấy Session ID."
                     );
-                    showPage("previewPage", currentMode);
+
+                    showPage(
+                        "previewPage",
+                        currentMode
+                    );
+
                     return;
+
                 }
+
                 const url =
                     CHECKIN_FORM +
                     "&entry.17087712=" +
-                    encodeURIComponent(sessionId);
-                console.log(
-                    "CHECK-IN hoàn tất. Chuyển sang Form báo cáo:",
-                    url
-                );
-                // Chuyển thẳng sang Google Form Check-in
-                window.location.href = url;
+                    encodeURIComponent(
+                        sessionId
+                    );
+
+                window.location.href =
+                    url;
+
                 return;
+
             }
-            // ==========================================
+
+
+            // ==================================
             // CHECK-OUT
-            // VẪN GIỮ MÀN HÌNH KẾT THÚC NHƯ CŨ
-            // ==========================================
-            showPage("finishPage", currentMode);
-        } else {
+            // ==================================
+
+            if(
+                currentMode ===
+                "CHECKOUT"
+            ){
+
+                document
+                .getElementById(
+                    "sessionValue"
+                )
+                .textContent =
+                    sessionId;
+
+                document
+                .getElementById(
+                    "finishDescription"
+                )
+                .textContent =
+                    "Ảnh Check-out đã được lưu. Hãy giữ lại Session ID để ghép ảnh với báo cáo.";
+
+                showPage(
+                    "finishPage",
+                    "CHECKOUT"
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        else{
+
             alert(
                 "Lưu ảnh thất bại: " +
-                (result.error || "Không rõ nguyên nhân")
+                (
+                    result.error ||
+                    "Không rõ nguyên nhân"
+                )
             );
-            showPage("previewPage", currentMode);
+
+            showPage(
+                "previewPage",
+                currentMode
+            );
+
         }
+
     }
+
     catch(error){
-        console.log("UPLOAD ERROR:", error);
+
+        console.log(
+            "UPLOAD ERROR:",
+            error
+        );
+
         alert(
             "Có lỗi khi upload ảnh.\n\n" +
             error.message
         );
-        showPage("previewPage", currentMode);
+
+        showPage(
+            "previewPage",
+            currentMode
+        );
+
     }
+
 }
 
-document.getElementById("btnFinish").onclick = ()=>{
-    capturedImage="";
-    storeCodeValue="";
-    reportDateValue="";
-    showPage("homePage");
+
+// ==========================================
+// UPLOAD BUTTON
+// ==========================================
+
+document
+.getElementById("btnUpload")
+.onclick = ()=>{
+
+    if(!capturedImage){
+
+        alert(
+            "Chưa có ảnh để lưu."
+        );
+
+        return;
+
+    }
+
+    if(!sessionId){
+
+        alert(
+            "Không tìm thấy Session ID."
+        );
+
+        return;
+
+    }
+
+    showPage(
+        "loadingPage",
+        currentMode
+    );
+
+    uploadImage();
+
 };
 
-document.getElementById("btnContinueReport").onclick = ()=>{
-    if(currentMode === "CHECKIN") {
-        if(!sessionId) {
-            alert("Không tìm thấy Session ID. Vui lòng thực hiện lại Check-in.");
-            return;
-        }
-        const url = CHECKIN_FORM + "&entry.17087712=" + encodeURIComponent(sessionId);
-        window.location.href = url;
+
+// ==========================================
+// COPY SESSION ID
+// ==========================================
+
+document
+.getElementById("btnCopySession")
+.onclick = async ()=>{
+
+    if(!sessionId){
+
+        alert(
+            "Không có Session ID."
+        );
+
         return;
+
     }
-    window.location.href = CHECKOUT_FORM;
+
+    try{
+
+        await navigator
+        .clipboard
+        .writeText(
+            sessionId
+        );
+
+        document
+        .getElementById(
+            "btnCopySession"
+        )
+        .textContent =
+        "✅ Đã copy Session ID";
+
+        setTimeout(()=>{
+
+            document
+            .getElementById(
+                "btnCopySession"
+            )
+            .textContent =
+            "📋 Copy Session ID";
+
+        },2000);
+
+    }
+
+    catch(error){
+
+        prompt(
+            "Hãy copy Session ID:",
+            sessionId
+        );
+
+    }
+
 };
+
+
+// ==========================================
+// CONTINUE REPORT
+// ==========================================
+
+document
+.getElementById("btnContinueReport")
+.onclick = ()=>{
+
+    if(
+        currentMode ===
+        "CHECKOUT"
+    ){
+
+        if(!sessionId){
+
+            alert(
+                "Không tìm thấy Session ID."
+            );
+
+            return;
+
+        }
+
+        const url =
+            CHECKOUT_FORM +
+            "&entry.432817307=" +
+            encodeURIComponent(
+                sessionId
+            );
+
+        window.location.href =
+            url;
+
+        return;
+
+    }
+
+
+    if(
+        currentMode ===
+        "CHECKIN"
+    ){
+
+        if(!sessionId){
+
+            alert(
+                "Không tìm thấy Session ID."
+            );
+
+            return;
+
+        }
+
+        const url =
+            CHECKIN_FORM +
+            "&entry.17087712=" +
+            encodeURIComponent(
+                sessionId
+            );
+
+        window.location.href =
+            url;
+
+    }
+
+};
+
+// ==========================================
+// FINISH
+// ==========================================
+
+document
+.getElementById("btnFinish")
+.onclick = ()=>{
+
+    capturedImage = "";
+    sessionId = "";
+    currentMode = "";
+
+    showPage(
+        "homePage"
+    );
+
+};
+
 </script>
+
 </body>
 </html>
