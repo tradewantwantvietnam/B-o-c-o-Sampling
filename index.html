@@ -348,10 +348,9 @@ body{
 
 <div id="app">
 
-<!-- ================= HOME ================= -->
+<!-- HOME -->
 
 <section id="homePage" class="page active">
-
 <div class="card">
 
 <h1>📸 Sampling 2026</h1>
@@ -369,14 +368,12 @@ Hệ thống Check-in / Check-out Sampling
 </button>
 
 </div>
-
 </section>
 
 
-<!-- ================= CHECKOUT CHOICE ================= -->
+<!-- CHECKOUT CHOICE -->
 
 <section id="checkoutChoicePage" class="page">
-
 <div class="card">
 
 <h2>🌙 Check-out</h2>
@@ -398,14 +395,12 @@ Chọn hình thức thực hiện
 </button>
 
 </div>
-
 </section>
 
 
-<!-- ================= CHECKOUT INFO ================= -->
+<!-- CHECKOUT INFO -->
 
 <section id="checkoutInfoPage" class="page">
-
 <div class="card">
 
 <h2>🌙 Thông tin Check-out</h2>
@@ -428,7 +423,6 @@ placeholder="Nhập tên PSS"
 autocomplete="name">
 
 </div>
-
 
 <div class="formGroup">
 
@@ -456,7 +450,6 @@ Mã điểm bán không đúng định dạng.
 
 </div>
 
-
 <div class="formGroup">
 
 <label for="workDate">
@@ -474,7 +467,6 @@ Chọn ngày thực tế thực hiện ca Sampling.
 
 </div>
 
-
 <button
 id="btnCheckoutInfoContinue"
 class="btnActionTheme"
@@ -490,14 +482,12 @@ type="button">
 </button>
 
 </div>
-
 </section>
 
 
-<!-- ================= CAMERA SETTING ================= -->
+<!-- CAMERA SETTING -->
 
 <section id="cameraSettingPage" class="page">
-
 <div class="card">
 
 <h2 id="cameraSettingTitle"></h2>
@@ -544,11 +534,10 @@ type="button">
 </button>
 
 </div>
-
 </section>
 
 
-<!-- ================= CAMERA ================= -->
+<!-- CAMERA -->
 
 <section id="cameraPage" class="page camera-page">
 
@@ -594,11 +583,10 @@ type="button">
 </button>
 
 </div>
-
 </section>
 
 
-<!-- ================= PREVIEW ================= -->
+<!-- PREVIEW -->
 
 <section id="previewPage" class="page">
 
@@ -644,11 +632,10 @@ style="display:none;">
 </button>
 
 </div>
-
 </section>
 
 
-<!-- ================= CHECKOUT FINISH ================= -->
+<!-- CHECKOUT FINISH -->
 
 <section id="finishPage" class="page">
 
@@ -661,7 +648,7 @@ style="display:none;">
 <p
 id="finishDescription"
 class="subtitle">
-Ảnh Check-out đã được lưu thành công.
+Ảnh Check-out đã được lưu.
 </p>
 
 <button
@@ -679,11 +666,10 @@ type="button">
 </button>
 
 </div>
-
 </section>
 
 
-<!-- ================= SESSION RESULT - CHECKIN ================= -->
+<!-- CHECKIN SESSION -->
 
 <section id="sessionPage" class="page">
 
@@ -739,11 +725,10 @@ type="button">
 </button>
 
 </div>
-
 </section>
 
 
-<!-- ================= LOADING ================= -->
+<!-- LOADING -->
 
 <section id="loadingPage" class="page">
 
@@ -760,7 +745,6 @@ Vui lòng không đóng trình duyệt
 </p>
 
 </div>
-
 </section>
 
 </div>
@@ -774,7 +758,18 @@ let currentCamera = "environment";
 let capturedImage = "";
 let sessionId = "";
 let isUploading = false;
-let retakeCount = 0;
+
+/*
+ * QUAN TRỌNG:
+ *
+ * photoErrorCount chỉ tăng khi:
+ * LƯU ẢNH THẤT BẠI.
+ *
+ * Bấm "Chụp lại" không tăng.
+ */
+let photoErrorCount = 0;
+
+const MAX_PHOTO_ERRORS = 3;
 
 let checkoutPSS = "";
 let checkoutStoreCode = "";
@@ -807,7 +802,7 @@ const IMAGE_QUALITY = 0.80;
 
 
 // ==========================================
-// SESSION
+// SESSION ID
 // ==========================================
 
 function createSessionId(){
@@ -839,7 +834,11 @@ function resetSession(){
     sessionId = "";
     currentMode = "";
     isUploading = false;
-    retakeCount = 0;
+
+    /*
+     * Reset số lần lỗi khi bắt đầu phiên mới.
+     */
+    photoErrorCount = 0;
 
     checkoutPSS = "";
     checkoutStoreCode = "";
@@ -1467,7 +1466,13 @@ function handleCapture(e){
         approxMB +
         " MB";
 
-    updateRetryUI();
+    /*
+     * Không tăng photoErrorCount tại đây.
+     *
+     * Chụp ảnh mới không phải lỗi.
+     */
+
+    updatePhotoErrorUI();
 
     showPage(
         "previewPage",
@@ -1532,10 +1537,10 @@ document
 
 
 // ==========================================
-// RETRY UI
+// PHOTO ERROR UI
 // ==========================================
 
-function updateRetryUI(){
+function updatePhotoErrorUI(){
 
     const retryInfo =
         document.getElementById(
@@ -1546,6 +1551,7 @@ function updateRetryUI(){
         document.getElementById(
             "btnCheckinReportAfterRetry"
         );
+
 
     if(currentMode !== "CHECKIN"){
 
@@ -1559,31 +1565,66 @@ function updateRetryUI(){
 
     }
 
-    if(retakeCount < 3){
+
+    /*
+     * Chưa có lỗi:
+     * không hiển thị cảnh báo.
+     */
+
+    if(photoErrorCount === 0){
 
         retryInfo.style.display =
-            "block";
-
-        retryInfo.textContent =
-            "Bạn đã chụp lại " +
-            retakeCount +
-            "/3 lần. Nếu ảnh chưa đạt, bạn có thể chụp lại.";
+            "none";
 
         reportButton.style.display =
             "none";
 
-    }else{
+        return;
+
+    }
+
+
+    /*
+     * Có lỗi nhưng chưa đủ 3 lần.
+     */
+
+    if(
+        photoErrorCount <
+        MAX_PHOTO_ERRORS
+    ){
 
         retryInfo.style.display =
             "block";
 
         retryInfo.textContent =
-            "⚠️ Bạn đã chụp lại 3 lần. Nếu tiếp tục lỗi, hãy chuyển sang báo cáo.";
+            "⚠️ Lưu ảnh bị lỗi " +
+            photoErrorCount +
+            "/" +
+            MAX_PHOTO_ERRORS +
+            " lần. Bạn có thể chụp lại hoặc thử lưu lại.";
 
         reportButton.style.display =
-            "block";
+            "none";
+
+        return;
 
     }
+
+
+    /*
+     * Đủ 3 lần LỖI LƯU ẢNH.
+     */
+
+    retryInfo.style.display =
+        "block";
+
+    retryInfo.textContent =
+        "❌ Ảnh đã lỗi khi lưu " +
+        MAX_PHOTO_ERRORS +
+        " lần. Bạn có thể chuyển sang báo cáo Check-in.";
+
+    reportButton.style.display =
+        "block";
 
 }
 
@@ -1596,7 +1637,10 @@ document
 .getElementById("btnRetake")
 .onclick = ()=>{
 
-    if(currentMode === "CHECKIN" && !sessionId){
+    if(
+        currentMode === "CHECKIN" &&
+        !sessionId
+    ){
 
         alert(
             "Không tìm thấy Session ID."
@@ -1605,6 +1649,7 @@ document
         return;
 
     }
+
 
     if(currentMode === "CHECKOUT"){
 
@@ -1629,7 +1674,15 @@ document
 
     }
 
-    retakeCount++;
+
+    /*
+     * QUAN TRỌNG:
+     *
+     * KHÔNG tăng photoErrorCount.
+     *
+     * Người dùng chủ động chụp lại
+     * không được xem là ảnh lỗi.
+     */
 
     capturedImage = "";
 
@@ -1639,7 +1692,7 @@ document
 
 
 // ==========================================
-// CHECK-IN REPORT AFTER RETRY
+// CHECK-IN REPORT AFTER 3 PHOTO ERRORS
 // ==========================================
 
 document
@@ -1657,6 +1710,15 @@ document
         alert(
             "Không tìm thấy Session ID."
         );
+
+        return;
+
+    }
+
+    if(
+        photoErrorCount <
+        MAX_PHOTO_ERRORS
+    ){
 
         return;
 
@@ -1681,6 +1743,7 @@ function getDeviceInfo(){
 
     let device =
         "Desktop";
+
 
     if(
         ua.indexOf("Firefox") > -1
@@ -1760,7 +1823,7 @@ function getDeviceInfo(){
 
 
 // ==========================================
-// CHECK-IN REPORT URL
+// CHECK-IN REPORT
 // ==========================================
 
 function openCheckinReport(){
@@ -1809,6 +1872,7 @@ async function uploadImage(){
         document.getElementById(
             "btnUpload"
         );
+
 
     try{
 
@@ -1933,9 +1997,11 @@ async function uploadImage(){
             result.success === true
         ){
 
-            // ==============================
-            // CHECK-IN
-            // ==============================
+            /*
+             * UPLOAD THÀNH CÔNG
+             *
+             * Không tăng photoErrorCount.
+             */
 
             if(
                 currentMode === "CHECKIN"
@@ -1947,10 +2013,6 @@ async function uploadImage(){
 
             }
 
-
-            // ==============================
-            // CHECK-OUT
-            // ==============================
 
             if(
                 currentMode === "CHECKOUT"
@@ -1985,55 +2047,135 @@ async function uploadImage(){
         throw new Error(
             serverError
         );
+
     }
+
+
     catch(error){
+
         console.error(
             "UPLOAD ERROR:",
             error
         );
-        alert(
+
+
+        /*
+         * ======================================
+         * CHỈ TẠI ĐÂY MỚI TĂNG photoErrorCount
+         * ======================================
+         *
+         * Đây là lỗi thực sự khi LƯU ẢNH.
+         */
+
+        if(
+            currentMode === "CHECKIN"
+        ){
+
+            photoErrorCount++;
+
+        }
+
+
+        let message =
             "❌ LƯU ẢNH THẤT BẠI\n\n" +
             "Ảnh chưa được lưu vào hệ thống.\n\n" +
-            error.message +
-            "\n\n" +
-            "Vui lòng thử lại."
-        );
+            error.message;
+
+
+        if(
+            currentMode === "CHECKIN"
+        ){
+
+            if(
+                photoErrorCount <
+                MAX_PHOTO_ERRORS
+            ){
+
+                message +=
+                    "\n\nLỗi lưu ảnh: " +
+                    photoErrorCount +
+                    "/" +
+                    MAX_PHOTO_ERRORS +
+                    ".";
+
+            }else{
+
+                message +=
+                    "\n\nĐã lỗi lưu ảnh " +
+                    MAX_PHOTO_ERRORS +
+                    " lần." +
+                    "\nBạn có thể chuyển sang báo cáo Check-in.";
+
+            }
+
+        }
+
+
+        alert(message);
+
+
+        updatePhotoErrorUI();
+
+
         showPage(
             "previewPage",
             currentMode
         );
+
     }
+
+
     finally{
+
         isUploading =
             false;
+
         uploadButton.disabled =
             false;
+
     }
+
 }
+
+
 // ==========================================
 // UPLOAD BUTTON
 // ==========================================
+
 document
 .getElementById("btnUpload")
 .onclick = ()=>{
+
     if(isUploading){
         return;
     }
+
+
     if(!capturedImage){
+
         alert(
             "Chưa có ảnh để lưu."
         );
+
         return;
+
     }
+
+
     if(
         currentMode === "CHECKIN" &&
         !sessionId
     ){
+
         alert(
             "Không tìm thấy Session ID."
         );
+
         return;
+
     }
+
+
     if(
         currentMode === "CHECKOUT" &&
         (
@@ -2042,38 +2184,58 @@ document
             !checkoutWorkDate
         )
     ){
+
         alert(
             "Thiếu thông tin Check-out."
         );
+
         return;
+
     }
+
+
     showPage(
         "loadingPage",
         currentMode
     );
+
     uploadImage();
+
 };
+
+
 // ==========================================
 // FINISH CHECKOUT
 // ==========================================
+
 document
 .getElementById("btnFinish")
 .onclick = ()=>{
+
     if(
         currentMode !==
         "CHECKOUT"
     ){
+
         return;
+
     }
+
     stopCamera();
+
     resetSession();
+
     showPage(
         "homePage"
     );
+
 };
+
+
 // ==========================================
 // BACK FROM FINISH
 // ==========================================
+
 document
 .getElementById("btnFinishBack")
 .onclick = ()=>{
@@ -2082,47 +2244,74 @@ document
         currentMode !==
         "CHECKOUT"
     ){
+
         return;
+
     }
+
     capturedImage = "";
+
     openCamera();
+
 };
+
+
 // ==========================================
-// COPY SESSION - CHECKIN ONLY
+// COPY SESSION
 // ==========================================
+
 document
 .getElementById("btnCopySession")
 .onclick = async ()=>{
+
     if(!sessionId){
+
         alert(
             "Không có Session ID."
         );
+
         return;
+
     }
+
+
     const button =
         document.getElementById(
             "btnCopySession"
         );
+
+
     try{
+
         if(
             navigator.clipboard &&
             navigator.clipboard.writeText
         ){
+
             await navigator
                 .clipboard
                 .writeText(
                     sessionId
                 );
+
         }else{
+
             throw new Error(
                 "Clipboard API unavailable"
             );
+
         }
+
+
         button.textContent =
             "✅ Đã copy Session ID";
+
+
         setTimeout(()=>{
+
             button.textContent =
                 "📋 Copy Session ID";
+
         },2000);
     }
     catch(error){
@@ -2130,25 +2319,37 @@ document
             "Hãy copy Session ID:",
             sessionId
         );
+
     }
+
 };
+
+
 // ==========================================
-// SESSION HOME - CHECKIN
+// SESSION HOME
 // ==========================================
+
 document
 .getElementById("btnSessionHome")
 .onclick = ()=>{
+
     stopCamera();
+
     resetSession();
+
     document
     .getElementById(
         "sessionValue"
     )
     .textContent = "";
+
     showPage(
         "homePage"
     );
+
 };
+
 </script>
+
 </body>
 </html>
