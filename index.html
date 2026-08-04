@@ -7,6 +7,7 @@
 <title>Sampling 2026</title>
 
 <style>
+
 *{
     margin:0;
     padding:0;
@@ -220,15 +221,24 @@ button:disabled{
     text-align:center;
 }
 
+
+/* ================= CAMERA ================= */
+
 .camera-page{
     background:#000;
     padding:0;
+    overflow:hidden;
 }
 
+/*
+ * contain:
+ * giữ toàn bộ khung camera,
+ * không phóng/cắt cảnh như cover.
+ */
 #video{
     width:100vw;
     height:100vh;
-    object-fit:cover;
+    object-fit:contain;
     background:#000;
 }
 
@@ -314,6 +324,7 @@ button:disabled{
 }
 
 @supports(padding:max(0px)){
+
     .cameraToolbar{
         padding-bottom:max(16px,env(safe-area-inset-bottom));
     }
@@ -321,6 +332,7 @@ button:disabled{
     .cameraGuideBanner{
         top:max(20px,env(safe-area-inset-top));
     }
+
 }
 
 body{
@@ -332,15 +344,19 @@ body{
 }
 
 @keyframes fade{
+
     from{
         opacity:0;
         transform:translateY(8px);
     }
+
     to{
         opacity:1;
         transform:none;
     }
+
 }
+
 </style>
 </head>
 
@@ -348,9 +364,11 @@ body{
 
 <div id="app">
 
-<!-- HOME -->
+
+<!-- ================= HOME ================= -->
 
 <section id="homePage" class="page active">
+
 <div class="card">
 
 <h1>📸 Sampling 2026</h1>
@@ -359,21 +377,27 @@ body{
 Hệ thống Check-in / Check-out Sampling
 </p>
 
-<button id="btnHomeCheckIn" class="btnCheckin">
+<button
+id="btnHomeCheckIn"
+class="btnCheckin">
 ☀️ Check-in
 </button>
 
-<button id="btnHomeCheckOut" class="btnCheckout">
+<button
+id="btnHomeCheckOut"
+class="btnCheckout">
 🌙 Check-out
 </button>
 
 </div>
+
 </section>
 
 
-<!-- CHECKOUT CHOICE -->
+<!-- ================= CHECKOUT CHOICE ================= -->
 
 <section id="checkoutChoicePage" class="page">
+
 <div class="card">
 
 <h2>🌙 Check-out</h2>
@@ -382,25 +406,36 @@ Hệ thống Check-in / Check-out Sampling
 Chọn hình thức thực hiện
 </p>
 
-<button id="btnCheckoutPhoto" class="btnActionTheme">
+<button
+id="btnCheckoutPhoto"
+class="btnActionTheme"
+type="button">
 📷 Chụp ảnh Check-out
 </button>
 
-<button id="btnCheckoutReport" class="btnActionTheme">
+<button
+id="btnCheckoutReport"
+class="btnActionTheme"
+type="button">
 📝 Làm báo cáo Check-out
 </button>
 
-<button id="btnCheckoutBack" class="btnBack">
+<button
+id="btnCheckoutBack"
+class="btnBack"
+type="button">
 ⬅ Quay lại
 </button>
 
 </div>
+
 </section>
 
 
-<!-- CHECKOUT INFO -->
+<!-- ================= CHECKOUT INFO ================= -->
 
 <section id="checkoutInfoPage" class="page">
+
 <div class="card">
 
 <h2>🌙 Thông tin Check-out</h2>
@@ -444,7 +479,9 @@ spellcheck="false">
 Mã gồm chữ in hoa + 1 đến 7 chữ số.
 </div>
 
-<div id="storeCodeError" class="errorText">
+<div
+id="storeCodeError"
+class="errorText">
 Mã điểm bán không đúng định dạng.
 </div>
 
@@ -482,12 +519,14 @@ type="button">
 </button>
 
 </div>
+
 </section>
 
 
-<!-- CAMERA SETTING -->
+<!-- ================= CAMERA SETTING ================= -->
 
 <section id="cameraSettingPage" class="page">
+
 <div class="card">
 
 <h2 id="cameraSettingTitle"></h2>
@@ -534,12 +573,15 @@ type="button">
 </button>
 
 </div>
+
 </section>
 
 
-<!-- CAMERA -->
+<!-- ================= CAMERA ================= -->
 
-<section id="cameraPage" class="page camera-page">
+<section
+id="cameraPage"
+class="page camera-page">
 
 <div class="cameraGuideBanner">
 📷 Đang ở chế độ CHỤP ẢNH (Bấm nút tròn để chụp)
@@ -583,10 +625,11 @@ type="button">
 </button>
 
 </div>
+
 </section>
 
 
-<!-- PREVIEW -->
+<!-- ================= PREVIEW ================= -->
 
 <section id="previewPage" class="page">
 
@@ -632,10 +675,11 @@ style="display:none;">
 </button>
 
 </div>
+
 </section>
 
 
-<!-- CHECKOUT FINISH -->
+<!-- ================= CHECKOUT FINISH ================= -->
 
 <section id="finishPage" class="page">
 
@@ -666,10 +710,11 @@ type="button">
 </button>
 
 </div>
+
 </section>
 
 
-<!-- CHECKIN SESSION -->
+<!-- ================= CHECKIN SESSION ================= -->
 
 <section id="sessionPage" class="page">
 
@@ -725,10 +770,11 @@ type="button">
 </button>
 
 </div>
+
 </section>
 
 
-<!-- LOADING -->
+<!-- ================= LOADING ================= -->
 
 <section id="loadingPage" class="page">
 
@@ -745,6 +791,7 @@ Vui lòng không đóng trình duyệt
 </p>
 
 </div>
+
 </section>
 
 </div>
@@ -759,14 +806,6 @@ let capturedImage = "";
 let sessionId = "";
 let isUploading = false;
 
-/*
- * QUAN TRỌNG:
- *
- * photoErrorCount chỉ tăng khi:
- * LƯU ẢNH THẤT BẠI.
- *
- * Bấm "Chụp lại" không tăng.
- */
 let photoErrorCount = 0;
 
 const MAX_PHOTO_ERRORS = 3;
@@ -820,7 +859,10 @@ function createSessionId(){
     const randomPart =
         Math.floor(Math.random()*9000+1000);
 
-    return "SMP-" + timePart + "-" + randomPart;
+    return "SMP-" +
+        timePart +
+        "-" +
+        randomPart;
 }
 
 
@@ -835,26 +877,37 @@ function resetSession(){
     currentMode = "";
     isUploading = false;
 
-    /*
-     * Reset số lần lỗi khi bắt đầu phiên mới.
-     */
     photoErrorCount = 0;
 
     checkoutPSS = "";
     checkoutStoreCode = "";
     checkoutWorkDate = "";
 
-    document.getElementById("pssName").value = "";
-    document.getElementById("storeCode").value = "";
-    document.getElementById("workDate").value = "";
+    document
+    .getElementById("pssName")
+    .value = "";
 
-    document.getElementById("storeCodeError").style.display = "none";
+    document
+    .getElementById("storeCode")
+    .value = "";
 
-    document.getElementById("retryInfo").style.display = "none";
+    document
+    .getElementById("workDate")
+    .value = "";
 
-    document.getElementById(
+    document
+    .getElementById("storeCodeError")
+    .style.display = "none";
+
+    document
+    .getElementById("retryInfo")
+    .style.display = "none";
+
+    document
+    .getElementById(
         "btnCheckinReportAfterRetry"
-    ).style.display = "none";
+    )
+    .style.display = "none";
 
 }
 
@@ -866,11 +919,13 @@ function resetSession(){
 function showPage(id,mode=""){
 
     document
-        .querySelectorAll(".page")
-        .forEach(p=>{
-            p.classList.remove("active");
-            p.classList.remove("page-checkout");
-        });
+    .querySelectorAll(".page")
+    .forEach(p=>{
+
+        p.classList.remove("active");
+        p.classList.remove("page-checkout");
+
+    });
 
     const target =
         document.getElementById(id);
@@ -888,28 +943,46 @@ function showPage(id,mode=""){
         id === "finishPage"
     ){
 
-        if(activeMode === "CHECKOUT"){
-            target.classList.add("page-checkout");
+        if(
+            activeMode === "CHECKOUT"
+        ){
+
+            target.classList.add(
+                "page-checkout"
+            );
+
         }
 
     }
 
     const buttons =
-        target.querySelectorAll(".btnActionTheme");
+        target.querySelectorAll(
+            ".btnActionTheme"
+        );
 
     buttons.forEach(btn=>{
 
-        if(activeMode === "CHECKIN"){
+        if(
+            activeMode === "CHECKIN"
+        ){
 
-            btn.style.background="#3b82f6";
-            btn.style.color="#fff";
+            btn.style.background =
+                "#3b82f6";
+
+            btn.style.color =
+                "#fff";
 
         }
 
-        if(activeMode === "CHECKOUT"){
+        if(
+            activeMode === "CHECKOUT"
+        ){
 
-            btn.style.background="#414952";
-            btn.style.color="#fff";
+            btn.style.background =
+                "#414952";
+
+            btn.style.color =
+                "#fff";
 
         }
 
@@ -928,14 +1001,17 @@ document
 
     resetSession();
 
-    currentMode = "CHECKIN";
+    currentMode =
+        "CHECKIN";
 
     sessionId =
         createSessionId();
 
     document
-        .getElementById("cameraSettingTitle")
-        .innerHTML =
+    .getElementById(
+        "cameraSettingTitle"
+    )
+    .innerHTML =
         "☀️ Check-in";
 
     showPage(
@@ -956,7 +1032,8 @@ document
 
     resetSession();
 
-    currentMode = "CHECKOUT";
+    currentMode =
+        "CHECKOUT";
 
     showPage(
         "checkoutChoicePage",
@@ -974,7 +1051,8 @@ document
 .getElementById("btnCheckoutPhoto")
 .onclick = ()=>{
 
-    currentMode = "CHECKOUT";
+    currentMode =
+        "CHECKOUT";
 
     showPage(
         "checkoutInfoPage",
@@ -992,7 +1070,8 @@ document
 .getElementById("btnCheckoutReport")
 .onclick = ()=>{
 
-    currentMode = "CHECKOUT";
+    currentMode =
+        "CHECKOUT";
 
     window.location.href =
         CHECKOUT_FORM;
@@ -1005,7 +1084,9 @@ document
 // ==========================================
 
 document
-.getElementById("btnCheckoutInfoContinue")
+.getElementById(
+    "btnCheckoutInfoContinue"
+)
 .onclick = ()=>{
 
     const pss =
@@ -1028,7 +1109,9 @@ document
 
     const storeError =
         document
-        .getElementById("storeCodeError");
+        .getElementById(
+            "storeCodeError"
+        );
 
 
     if(!pss){
@@ -1047,7 +1130,9 @@ document
 
 
     if(
-        !/^[A-Z]+[0-9]{1,7}$/.test(store)
+        !/^[A-Z]+[0-9]{1,7}$/.test(
+            store
+        )
     ){
 
         storeError.style.display =
@@ -1086,7 +1171,9 @@ document
     checkoutWorkDate = date;
 
     document
-    .getElementById("cameraSettingTitle")
+    .getElementById(
+        "cameraSettingTitle"
+    )
     .innerHTML =
         "🌙 Chụp ảnh Check-out";
 
@@ -1099,7 +1186,9 @@ document
 
 
 document
-.getElementById("btnCheckoutInfoBack")
+.getElementById(
+    "btnCheckoutInfoBack"
+)
 .onclick = ()=>{
 
     showPage(
@@ -1118,16 +1207,22 @@ document
 .getElementById("btnCheckoutBack")
 .onclick = ()=>{
 
-    showPage("homePage");
+    showPage(
+        "homePage"
+    );
 
 };
 
 
 document
-.getElementById("btnCameraSettingBack")
+.getElementById(
+    "btnCameraSettingBack"
+)
 .onclick = ()=>{
 
-    if(currentMode === "CHECKIN"){
+    if(
+        currentMode === "CHECKIN"
+    ){
 
         showPage(
             "homePage"
@@ -1155,13 +1250,19 @@ document
 
     currentCamera =
         document
-        .getElementById("cameraSelect")
+        .getElementById(
+            "cameraSelect"
+        )
         .value;
 
     openCamera();
 
 };
 
+
+// ==========================================
+// OPEN CAMERA
+// ==========================================
 
 async function openCamera(){
 
@@ -1188,9 +1289,18 @@ async function openCamera(){
 
         }
 
+
+        /*
+         * Dùng 4:3 thay vì ép 1920x1920.
+         *
+         * Giúp iPhone lấy được nhiều cảnh
+         * hơn và giảm hiện tượng zoom/crop.
+         */
+
         const constraints = {
 
             video:{
+
                 facingMode:{
                     ideal:currentCamera
                 },
@@ -1200,13 +1310,19 @@ async function openCamera(){
                 },
 
                 height:{
-                    ideal:1920
+                    ideal:1440
+                },
+
+                aspectRatio:{
+                    ideal:4 / 3
                 }
+
             },
 
             audio:false
 
         };
+
 
         stream =
             await navigator
@@ -1215,21 +1331,28 @@ async function openCamera(){
                 constraints
             );
 
+
         const video =
             document
-            .getElementById("video");
+            .getElementById(
+                "video"
+            );
+
 
         video.srcObject =
             stream;
+
 
         showPage(
             "cameraPage",
             currentMode
         );
 
+
         await video
-            .play()
-            .catch(()=>{});
+        .play()
+        .catch(()=>{});
+
 
     }
 
@@ -1240,23 +1363,29 @@ async function openCamera(){
             error
         );
 
+
         if(stream){
 
             stream
             .getTracks()
-            .forEach(track=>track.stop());
+            .forEach(
+                track=>track.stop()
+            );
 
             stream = null;
 
         }
+
 
         showPage(
             "cameraSettingPage",
             currentMode
         );
 
+
         let message =
             "Không mở được camera.\n\n";
+
 
         if(
             error.name ===
@@ -1264,8 +1393,8 @@ async function openCamera(){
         ){
 
             message +=
-            "❌ Trình duyệt đang CHẶN quyền Camera.\n\n" +
-            "Hãy cho phép Camera rồi thử lại.";
+                "❌ Trình duyệt đang CHẶN quyền Camera.\n\n" +
+                "Hãy cho phép Camera rồi thử lại.";
 
         }
 
@@ -1275,19 +1404,20 @@ async function openCamera(){
         ){
 
             message +=
-            "❌ Không tìm thấy camera trên thiết bị.";
+                "❌ Không tìm thấy camera trên thiết bị.";
 
         }
 
         else{
 
             message +=
-            "❌ Lỗi: " +
-            error.name +
-            "\n\n" +
-            error.message;
+                "❌ Lỗi: " +
+                error.name +
+                "\n\n" +
+                error.message;
 
         }
+
 
         alert(message);
 
@@ -1301,17 +1431,83 @@ async function openCamera(){
 // ==========================================
 
 document
-.getElementById("btnSwitchCamera")
+.getElementById(
+    "btnSwitchCamera"
+)
 .onclick = ()=>{
 
     currentCamera =
-        currentCamera === "environment"
+        currentCamera ===
+        "environment"
         ? "user"
         : "environment";
 
     openCamera();
 
 };
+
+
+// ==========================================
+// LẤY GÓC XOAY THIẾT BỊ
+// ==========================================
+
+function getDeviceOrientation(){
+
+    let angle = 0;
+
+
+    if(
+        screen.orientation &&
+        typeof screen.orientation.angle ===
+        "number"
+    ){
+
+        angle =
+            screen.orientation.angle;
+
+    }
+
+    else if(
+        typeof window.orientation ===
+        "number"
+    ){
+
+        angle =
+            window.orientation;
+
+    }
+
+
+    angle =
+        ((angle % 360) + 360) % 360;
+
+
+    /*
+     * Một số iPhone trả về -90
+     * hoặc giá trị tương đương.
+     */
+
+    if(angle === 270){
+
+        return 270;
+
+    }
+
+    if(angle === 90){
+
+        return 90;
+
+    }
+
+    if(angle === 180){
+
+        return 180;
+
+    }
+
+    return 0;
+
+}
 
 
 // ==========================================
@@ -1327,6 +1523,7 @@ function handleCapture(e){
 
     }
 
+
     if(!stream){
 
         alert(
@@ -1337,9 +1534,13 @@ function handleCapture(e){
 
     }
 
+
     const video =
         document
-        .getElementById("video");
+        .getElementById(
+            "video"
+        );
+
 
     if(
         !video.videoWidth ||
@@ -1355,27 +1556,75 @@ function handleCapture(e){
 
     }
 
+
     const canvas =
         document
-        .getElementById("canvas");
+        .getElementById(
+            "canvas"
+        );
 
-    let sourceWidth =
+
+    const sourceWidth =
         video.videoWidth;
 
-    let sourceHeight =
+    const sourceHeight =
         video.videoHeight;
 
-    let targetWidth =
+
+    /*
+     * Lấy hướng màn hình tại đúng thời điểm
+     * bấm nút chụp.
+     */
+
+    const angle =
+        getDeviceOrientation();
+
+
+    /*
+     * Khi quay ngang:
+     *
+     * 90 / 270
+     * → đổi chiều canvas.
+     */
+
+    let outputWidth =
         sourceWidth;
 
-    let targetHeight =
+    let outputHeight =
         sourceHeight;
+
+
+    if(
+        angle === 90 ||
+        angle === 270
+    ){
+
+        outputWidth =
+            sourceHeight;
+
+        outputHeight =
+            sourceWidth;
+
+    }
+
+
+    /*
+     * Giới hạn cạnh dài tối đa 1920px.
+     */
+
+    let targetWidth =
+        outputWidth;
+
+    let targetHeight =
+        outputHeight;
+
 
     const longestSide =
         Math.max(
-            sourceWidth,
-            sourceHeight
+            outputWidth,
+            outputHeight
         );
+
 
     if(
         longestSide >
@@ -1388,21 +1637,25 @@ function handleCapture(e){
 
         targetWidth =
             Math.round(
-                sourceWidth * scale
+                outputWidth *
+                scale
             );
 
         targetHeight =
             Math.round(
-                sourceHeight * scale
+                outputHeight *
+                scale
             );
 
     }
+
 
     canvas.width =
         targetWidth;
 
     canvas.height =
         targetHeight;
+
 
     const ctx =
         canvas.getContext(
@@ -1412,19 +1665,121 @@ function handleCapture(e){
             }
         );
 
+
     ctx.imageSmoothingEnabled =
         true;
 
     ctx.imageSmoothingQuality =
         "high";
 
-    ctx.drawImage(
-        video,
+
+    /*
+     * Xóa canvas cũ.
+     */
+
+    ctx.clearRect(
         0,
         0,
         targetWidth,
         targetHeight
     );
+
+
+    ctx.save();
+
+
+    /*
+     * Đưa tâm canvas về giữa.
+     */
+
+    ctx.translate(
+        targetWidth / 2,
+        targetHeight / 2
+    );
+
+
+    /*
+     * Xoay ảnh theo hướng điện thoại.
+     *
+     * 90:
+     * quay phải
+     *
+     * 270:
+     * quay trái
+     */
+
+    if(angle === 90){
+
+        ctx.rotate(
+            Math.PI / 2
+        );
+
+    }
+
+    else if(angle === 180){
+
+        ctx.rotate(
+            Math.PI
+        );
+
+    }
+
+    else if(angle === 270){
+
+        ctx.rotate(
+            -Math.PI / 2
+        );
+
+    }
+
+
+    /*
+     * Sau khi xoay 90/270,
+     * chiều rộng và cao phải đổi.
+     */
+
+    let drawWidth =
+        targetWidth;
+
+    let drawHeight =
+        targetHeight;
+
+
+    if(
+        angle === 90 ||
+        angle === 270
+    ){
+
+        drawWidth =
+            targetHeight;
+
+        drawHeight =
+            targetWidth;
+
+    }
+
+
+    /*
+     * Vẽ toàn bộ frame camera.
+     *
+     * Không crop.
+     */
+
+    ctx.drawImage(
+        video,
+        -drawWidth / 2,
+        -drawHeight / 2,
+        drawWidth,
+        drawHeight
+    );
+
+
+    ctx.restore();
+
+
+    /*
+     * Chuyển thành JPEG.
+     */
 
     capturedImage =
         canvas.toDataURL(
@@ -1432,19 +1787,23 @@ function handleCapture(e){
             IMAGE_QUALITY
         );
 
+
     stopCamera();
+
 
     document
     .getElementById(
         "previewImage"
     )
     .src =
-    capturedImage;
+        capturedImage;
+
 
     const approxBytes =
         Math.round(
             (capturedImage.length * 3) / 4
         );
+
 
     const approxMB =
         (
@@ -1452,6 +1811,7 @@ function handleCapture(e){
             1024 /
             1024
         ).toFixed(2);
+
 
     document
     .getElementById(
@@ -1466,13 +1826,13 @@ function handleCapture(e){
         approxMB +
         " MB";
 
+
     /*
-     * Không tăng photoErrorCount tại đây.
-     *
-     * Chụp ảnh mới không phải lỗi.
+     * Chụp ảnh mới không phải lỗi lưu.
      */
 
     updatePhotoErrorUI();
+
 
     showPage(
         "previewPage",
@@ -1483,7 +1843,9 @@ function handleCapture(e){
 
 
 document
-.getElementById("btnCapture")
+.getElementById(
+    "btnCapture"
+)
 .onclick =
 handleCapture;
 
@@ -1498,7 +1860,9 @@ function stopCamera(){
 
         stream
         .getTracks()
-        .forEach(track=>track.stop());
+        .forEach(
+            track=>track.stop()
+        );
 
         stream = null;
 
@@ -1512,19 +1876,26 @@ function stopCamera(){
 // ==========================================
 
 document
-.getElementById("btnCancelCamera")
+.getElementById(
+    "btnCancelCamera"
+)
 .onclick = ()=>{
 
     stopCamera();
 
-    if(currentMode === "CHECKIN"){
+
+    if(
+        currentMode === "CHECKIN"
+    ){
 
         showPage(
             "cameraSettingPage",
             "CHECKIN"
         );
 
-    }else{
+    }
+
+    else{
 
         showPage(
             "cameraSettingPage",
@@ -1553,7 +1924,9 @@ function updatePhotoErrorUI(){
         );
 
 
-    if(currentMode !== "CHECKIN"){
+    if(
+        currentMode !== "CHECKIN"
+    ){
 
         retryInfo.style.display =
             "none";
@@ -1566,12 +1939,9 @@ function updatePhotoErrorUI(){
     }
 
 
-    /*
-     * Chưa có lỗi:
-     * không hiển thị cảnh báo.
-     */
-
-    if(photoErrorCount === 0){
+    if(
+        photoErrorCount === 0
+    ){
 
         retryInfo.style.display =
             "none";
@@ -1583,10 +1953,6 @@ function updatePhotoErrorUI(){
 
     }
 
-
-    /*
-     * Có lỗi nhưng chưa đủ 3 lần.
-     */
 
     if(
         photoErrorCount <
@@ -1611,10 +1977,6 @@ function updatePhotoErrorUI(){
     }
 
 
-    /*
-     * Đủ 3 lần LỖI LƯU ẢNH.
-     */
-
     retryInfo.style.display =
         "block";
 
@@ -1634,7 +1996,9 @@ function updatePhotoErrorUI(){
 // ==========================================
 
 document
-.getElementById("btnRetake")
+.getElementById(
+    "btnRetake"
+)
 .onclick = ()=>{
 
     if(
@@ -1651,7 +2015,9 @@ document
     }
 
 
-    if(currentMode === "CHECKOUT"){
+    if(
+        currentMode === "CHECKOUT"
+    ){
 
         if(
             !checkoutPSS ||
@@ -1676,12 +2042,8 @@ document
 
 
     /*
-     * QUAN TRỌNG:
-     *
-     * KHÔNG tăng photoErrorCount.
-     *
-     * Người dùng chủ động chụp lại
-     * không được xem là ảnh lỗi.
+     * Chụp lại chủ động:
+     * không tăng photoErrorCount.
      */
 
     capturedImage = "";
@@ -1701,9 +2063,14 @@ document
 )
 .onclick = ()=>{
 
-    if(currentMode !== "CHECKIN"){
+    if(
+        currentMode !== "CHECKIN"
+    ){
+
         return;
+
     }
+
 
     if(!sessionId){
 
@@ -1715,6 +2082,7 @@ document
 
     }
 
+
     if(
         photoErrorCount <
         MAX_PHOTO_ERRORS
@@ -1723,6 +2091,7 @@ document
         return;
 
     }
+
 
     openCheckinReport();
 
@@ -1749,38 +2118,54 @@ function getDeviceInfo(){
         ua.indexOf("Firefox") > -1
     ){
 
-        browser="Firefox";
+        browser =
+            "Firefox";
 
-    }else if(
+    }
+
+    else if(
         ua.indexOf("SamsungBrowser") > -1
     ){
 
-        browser="Samsung Internet";
+        browser =
+            "Samsung Internet";
 
-    }else if(
+    }
+
+    else if(
         ua.indexOf("Opera") > -1 ||
         ua.indexOf("OPR") > -1
     ){
 
-        browser="Opera";
+        browser =
+            "Opera";
 
-    }else if(
+    }
+
+    else if(
         ua.indexOf("Edg") > -1
     ){
 
-        browser="Chromium Edge";
+        browser =
+            "Chromium Edge";
 
-    }else if(
+    }
+
+    else if(
         ua.indexOf("Chrome") > -1
     ){
 
-        browser="Chrome";
+        browser =
+            "Chrome";
 
-    }else if(
+    }
+
+    else if(
         ua.indexOf("Safari") > -1
     ){
 
-        browser="Safari";
+        browser =
+            "Safari";
 
     }
 
@@ -1790,29 +2175,36 @@ function getDeviceInfo(){
     ){
 
         device =
-        "Android Phone/Tablet";
+            "Android Phone/Tablet";
 
-    }else if(
+    }
+
+    else if(
         /iPad|iPhone|iPod/.test(ua) &&
         !window.MSStream
     ){
 
         device =
-        "iOS (iPhone/iPad)";
+            "iOS (iPhone/iPad)";
 
-    }else if(
+    }
+
+    else if(
         /Mobile|Android|BlackBerry|IEMobile|Kindle|Silk|Opera Mini/i.test(ua)
     ){
 
         device =
-        "Mobile Other";
-
-    }else{
-
-        device =
-        "PC / Desktop";
+            "Mobile Other";
 
     }
+
+    else{
+
+        device =
+            "PC / Desktop";
+
+    }
+
 
     return{
         device,
@@ -1838,17 +2230,22 @@ function openCheckinReport(){
 
     }
 
+
     const separator =
         CHECKIN_FORM.includes("?")
         ? "&"
         : "?";
+
 
     const url =
         CHECKIN_FORM +
         separator +
         CHECKIN_SESSION_ENTRY +
         "=" +
-        encodeURIComponent(sessionId);
+        encodeURIComponent(
+            sessionId
+        );
+
 
     window.location.href =
         url;
@@ -1863,10 +2260,14 @@ function openCheckinReport(){
 async function uploadImage(){
 
     if(isUploading){
+
         return;
+
     }
 
+
     isUploading = true;
+
 
     const uploadButton =
         document.getElementById(
@@ -1973,7 +2374,10 @@ async function uploadImage(){
                     },
 
                     body:
-                        JSON.stringify(payload)
+                        JSON.stringify(
+                            payload
+                        )
+
                 }
             );
 
@@ -1996,12 +2400,6 @@ async function uploadImage(){
             result &&
             result.success === true
         ){
-
-            /*
-             * UPLOAD THÀNH CÔNG
-             *
-             * Không tăng photoErrorCount.
-             */
 
             if(
                 currentMode === "CHECKIN"
@@ -2060,11 +2458,7 @@ async function uploadImage(){
 
 
         /*
-         * ======================================
-         * CHỈ TẠI ĐÂY MỚI TĂNG photoErrorCount
-         * ======================================
-         *
-         * Đây là lỗi thực sự khi LƯU ẢNH.
+         * Chỉ lỗi LƯU ẢNH mới tăng count.
          */
 
         if(
@@ -2098,7 +2492,9 @@ async function uploadImage(){
                     MAX_PHOTO_ERRORS +
                     ".";
 
-            }else{
+            }
+
+            else{
 
                 message +=
                     "\n\nĐã lỗi lưu ảnh " +
@@ -2143,11 +2539,15 @@ async function uploadImage(){
 // ==========================================
 
 document
-.getElementById("btnUpload")
+.getElementById(
+    "btnUpload"
+)
 .onclick = ()=>{
 
     if(isUploading){
+
         return;
+
     }
 
 
@@ -2199,6 +2599,7 @@ document
         currentMode
     );
 
+
     uploadImage();
 
 };
@@ -2209,7 +2610,9 @@ document
 // ==========================================
 
 document
-.getElementById("btnFinish")
+.getElementById(
+    "btnFinish"
+)
 .onclick = ()=>{
 
     if(
@@ -2220,6 +2623,7 @@ document
         return;
 
     }
+
 
     stopCamera();
 
@@ -2237,7 +2641,9 @@ document
 // ==========================================
 
 document
-.getElementById("btnFinishBack")
+.getElementById(
+    "btnFinishBack"
+)
 .onclick = ()=>{
 
     if(
@@ -2248,6 +2654,7 @@ document
         return;
 
     }
+
 
     capturedImage = "";
 
@@ -2261,7 +2668,9 @@ document
 // ==========================================
 
 document
-.getElementById("btnCopySession")
+.getElementById(
+    "btnCopySession"
+)
 .onclick = async ()=>{
 
     if(!sessionId){
@@ -2289,12 +2698,14 @@ document
         ){
 
             await navigator
-                .clipboard
-                .writeText(
-                    sessionId
-                );
+            .clipboard
+            .writeText(
+                sessionId
+            );
 
-        }else{
+        }
+
+        else{
 
             throw new Error(
                 "Clipboard API unavailable"
@@ -2313,8 +2724,11 @@ document
                 "📋 Copy Session ID";
 
         },2000);
+
     }
+
     catch(error){
+
         prompt(
             "Hãy copy Session ID:",
             sessionId
@@ -2330,7 +2744,9 @@ document
 // ==========================================
 
 document
-.getElementById("btnSessionHome")
+.getElementById(
+    "btnSessionHome"
+)
 .onclick = ()=>{
 
     stopCamera();
